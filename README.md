@@ -1,6 +1,8 @@
 # HelloJess
 
-A task/productivity app with a Python (FastAPI) backend, a React (Vite) web app, and a React Native (Expo) mobile app — all sharing the same API.
+HelloJess is a task/productivity app for keeping track of what you need to get done — add tasks, set a priority (low/medium/high) and an optional due date, check things off, and see them synced across every device you're logged into. It's built as three pieces sharing one backend: a **Python/FastAPI API**, a **React web app**, and a **React Native (Expo) mobile app**.
+
+![HelloJess web app screenshot](docs/web-screenshot.png)
 
 ## Structure
 
