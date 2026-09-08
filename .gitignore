@@ -1,0 +1,17 @@
+# Python
+backend/venv/
+**/__pycache__/
+*.pyc
+backend/hellojess.db
+backend/.env
+
+# Node
+**/node_modules/
+web/dist/
+mobile/.expo/
+web/.env
+mobile/.env
+
+# OS
+.DS_Store
+Thumbs.db

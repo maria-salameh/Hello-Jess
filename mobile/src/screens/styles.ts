@@ -1,0 +1,197 @@
+import { Platform, StyleSheet } from "react-native";
+
+const colors = {
+  bg: "#17161a",
+  card: "#211f26",
+  text: "#f2f0ef",
+  muted: "#a29e9b",
+  accent: "#6c5ce7",
+  border: "#33313a",
+  danger: "#e2574c",
+  high: "#e2574c",
+  medium: "#e2a33c",
+  low: "#4caf82",
+};
+
+export const styles = StyleSheet.create({
+  authPage: {
+    flex: 1,
+    backgroundColor: colors.bg,
+    justifyContent: "center",
+    padding: 24,
+  },
+  authCard: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 24,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: colors.accent,
+  },
+  subtitle: {
+    color: colors.muted,
+    fontSize: 14,
+  },
+  label: {
+    color: colors.muted,
+    fontSize: 13,
+    marginTop: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    padding: Platform.OS === "ios" ? 12 : 10,
+    color: colors.text,
+    backgroundColor: colors.bg,
+    fontSize: 15,
+  },
+  button: {
+    backgroundColor: colors.accent,
+    borderRadius: 10,
+    padding: 12,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 15,
+  },
+  error: {
+    backgroundColor: "rgba(226,87,76,0.15)",
+    color: colors.danger,
+    padding: 8,
+    borderRadius: 8,
+    fontSize: 13,
+  },
+  switchText: {
+    color: colors.accent,
+    textAlign: "center",
+    marginTop: 10,
+    fontSize: 14,
+  },
+  tasksPage: {
+    flex: 1,
+    backgroundColor: colors.bg,
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === "ios" ? 60 : 40,
+    gap: 10,
+  },
+  tasksHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 4,
+  },
+  logoutBtn: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  logoutText: {
+    color: colors.muted,
+    fontSize: 13,
+  },
+  priorityRow: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  priorityChip: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  priorityChipActive: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  priorityChipText: {
+    color: colors.muted,
+    fontSize: 13,
+    textTransform: "capitalize",
+  },
+  priorityChipTextActive: {
+    color: "#fff",
+  },
+  addBtn: {
+    backgroundColor: colors.accent,
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+    marginLeft: "auto",
+  },
+  showCompletedRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  emptyState: {
+    color: colors.muted,
+    textAlign: "center",
+    marginTop: 40,
+  },
+  taskItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    backgroundColor: colors.card,
+    borderRadius: 10,
+    borderLeftWidth: 4,
+    borderColor: colors.border,
+    padding: 14,
+  },
+  priority_high: { borderLeftColor: colors.high },
+  priority_medium: { borderLeftColor: colors.medium },
+  priority_low: { borderLeftColor: colors.low },
+  checkbox: {
+    paddingTop: 2,
+  },
+  checkboxBox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: colors.muted,
+  },
+  checkboxBoxChecked: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  taskTitle: {
+    color: colors.text,
+    fontWeight: "600",
+    fontSize: 15,
+  },
+  taskTitleCompleted: {
+    textDecorationLine: "line-through",
+    color: colors.muted,
+  },
+  badge: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.border,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginTop: 6,
+  },
+  badgeText: {
+    color: colors.muted,
+    fontSize: 11,
+    textTransform: "uppercase",
+  },
+  deleteBtn: {
+    color: colors.muted,
+    fontSize: 20,
+  },
+});
