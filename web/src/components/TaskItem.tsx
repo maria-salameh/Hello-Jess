@@ -19,7 +19,9 @@ export default function TaskItem({ task, onToggle, onDelete }: Props) {
         <div className="task-meta">
           <span className={`badge badge-${task.priority}`}>{task.priority}</span>
           {task.due_date && (
-            <span className="due-date">Due {new Date(task.due_date).toLocaleDateString()}</span>
+            <span className="due-date">
+              Due {new Date(task.due_date).toLocaleDateString(undefined, { timeZone: "UTC" })}
+            </span>
           )}
         </div>
       </div>

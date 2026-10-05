@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
 });
 
 api.interceptors.request.use((config) => {
@@ -13,14 +13,14 @@ api.interceptors.request.use((config) => {
 });
 
 export type User = {
-  id: number;
+  id: string;
   email: string;
   name: string;
   created_at: string;
 };
 
 export type Task = {
-  id: number;
+  id: string;
   title: string;
   notes: string | null;
   due_date: string | null;

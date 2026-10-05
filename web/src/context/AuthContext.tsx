@@ -29,12 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function login(email: string, password: string) {
-    const form = new URLSearchParams();
-    form.set("username", email);
-    form.set("password", password);
-    const res = await api.post("/auth/login", form, {
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    });
+    const res = await api.post("/auth/login", { email, password });
     localStorage.setItem("hellojess_token", res.data.access_token);
     setUser(res.data.user);
   }

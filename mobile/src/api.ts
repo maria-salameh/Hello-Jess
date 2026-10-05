@@ -4,7 +4,7 @@ import axios from "axios";
 export const TOKEN_KEY = "hellojess_token";
 
 export const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  baseURL: `${process.env.EXPO_PUBLIC_API_URL}/api`,
 });
 
 api.interceptors.request.use(async (config) => {
@@ -16,14 +16,14 @@ api.interceptors.request.use(async (config) => {
 });
 
 export type User = {
-  id: number;
+  id: string;
   email: string;
   name: string;
   created_at: string;
 };
 
 export type Task = {
-  id: number;
+  id: string;
   title: string;
   notes: string | null;
   due_date: string | null;

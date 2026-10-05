@@ -35,12 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function login(email: string, password: string) {
-    const form = new URLSearchParams();
-    form.set("username", email);
-    form.set("password", password);
-    const res = await api.post("/auth/login", form.toString(), {
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    });
+    const res = await api.post("/auth/login", { email, password });
     await AsyncStorage.setItem(TOKEN_KEY, res.data.access_token);
     setUser(res.data.user);
   }
