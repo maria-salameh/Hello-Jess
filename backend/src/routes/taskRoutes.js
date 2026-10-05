@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   createTask,
   deleteTask,
-  listTasks,
+  getAllTasks,
   updateTask,
 } from "../controllers/taskController.js";
 import { requireAuth, validate } from "../middleware.js";
@@ -12,7 +12,7 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.get("/", validate(taskListQuerySchema, "query"), listTasks);
+router.get("/", validate(taskListQuerySchema, "query"), getAllTasks);
 router.post("/", validate(taskCreateSchema), createTask);
 router.patch("/:id", validate(taskUpdateSchema), updateTask);
 router.delete("/:id", deleteTask);
