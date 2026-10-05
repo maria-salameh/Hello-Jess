@@ -1,8 +1,9 @@
 // La grille d'un mois du calendrier : une case par jour (du lundi au dimanche), avec les événements
-// du jour affichés en couleur :
-// - violet : tâche à faire (rouge si l'échéance est dépassée)   - vert : tâche terminée   - bleu : habitude réalisée
+// du jour affichés en couleur. La couleur d'une tâche dépend de son statut :
+// - violet : à faire   - orange : en cours   - vert : terminée   - bleu : habitude réalisée
+// Une tâche à faire ou en cours dont l'échéance est dépassée garde la couleur de son statut mais est entourée de rouge.
 import type { CalendarEvent } from "../api";
-import { addDays, dayOfMonth } from "../utils/dates";
+import { addDays, dayOfMonth, formatDate } from "../utils/dates";
 
 // Combien d'événements on montre dans une case avant d'écrire "+ N more".
 const MAX_VISIBLE = 3;
@@ -10,11 +11,39 @@ const MAX_VISIBLE = 3;
 // Les jours de la semaine affichés en haut de la grille.
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-// La classe CSS (donc la couleur) d'un événement. Une tâche à faire dont la date est passée est "overdue" (rouge).
+// Les noms des statuts, tels qu'affichés dans la liste du jour.
+const STATUS_LABEL = { todo: "To do", doing: "Doing", done: "Done" };
+
+// Une tâche est en retard si elle est à faire ou en cours et que son échéance est passée : soit elle est affichée
+// à son échéance (qui est avant aujourd'hui), soit elle a été reportée sur aujourd'hui ("task-overdue").
+export function isOverdue(event: CalendarEvent, today: string): boolean {
+  if (event.type === "task-overdue") return true;
+  return event.type === "task-due" && event.status !== "done" && event.date < today;
+}
+
+// Les classes CSS (donc les couleurs) d'un événement : le statut pour une tâche ("todo", "doing" ou "done"),
+// "habit" pour une habitude, plus "overdue" (contour rouge) si la tâche est en retard.
 export function eventClass(event: CalendarEvent, today: string): string {
-  if (event.type === "task-done") return "done";
   if (event.type === "habit") return "habit";
-  return event.date < today ? "overdue" : "due";
+  return `${event.status ?? "todo"}${isOverdue(event, today) ? " overdue" : ""}`;
+}
+
+// La phrase qui décrit un événement dans la liste du jour, par exemple "Doing · due this day · overdue".
+export function describeEvent(event: CalendarEvent, today: string): string {
+  if (event.type === "habit") return "Habit done";
+  if (event.type === "task-done") return "Task completed";
+
+  const status = STATUS_LABEL[event.status ?? "todo"];
+  // Une tâche reportée sur aujourd'hui rappelle depuis quand elle est en retard.
+  if (event.type === "task-overdue") {
+    return [status, `overdue since ${formatDate(event.dueDate ?? event.date)}`, `${event.priority} priority`].join(" · ");
+  }
+
+  const when = event.type === "task-due" ? "due this day" : "added this day, no due date";
+  const parts = [status, when];
+  if (isOverdue(event, today)) parts.push("overdue");
+  if (event.priority) parts.push(`${event.priority} priority`);
+  return parts.join(" · ");
 }
 
 type Props = {
@@ -79,16 +108,19 @@ export default function CalendarView({ month, gridStart, gridEnd, events, today,
       {/* La légende des couleurs. */}
       <div className="calendar-legend">
         <span>
-          <i className="calendar-dot due" /> Task due
+          <i className="calendar-dot todo" /> To do
         </span>
         <span>
-          <i className="calendar-dot overdue" /> Overdue
+          <i className="calendar-dot doing" /> Doing
         </span>
         <span>
-          <i className="calendar-dot done" /> Task completed
+          <i className="calendar-dot done" /> Done
         </span>
         <span>
-          <i className="calendar-dot habit" /> Habit done
+          <i className="calendar-dot habit" /> Habit
+        </span>
+        <span>
+          <i className="calendar-dot overdue ring" /> Overdue (red outline)
         </span>
       </div>
     </div>

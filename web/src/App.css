@@ -793,14 +793,15 @@
   color: var(--muted);
 }
 
-/* Les couleurs des événements (utilisées par les étiquettes et les points de la légende / de la liste du jour). */
-.calendar-event.due,
-.calendar-dot.due {
+/* Les couleurs des événements (utilisées par les étiquettes et les points de la légende / de la liste du jour).
+   Une tâche prend la couleur de son statut : violet (à faire), orange (en cours), vert (terminée). */
+.calendar-event.todo,
+.calendar-dot.todo {
   background: var(--accent);
 }
-.calendar-event.overdue,
-.calendar-dot.overdue {
-  background: #e2574c;
+.calendar-event.doing,
+.calendar-dot.doing {
+  background: #e08a1e;
 }
 .calendar-event.done,
 .calendar-dot.done {
@@ -809,6 +810,17 @@
 .calendar-event.habit,
 .calendar-dot.habit {
   background: #2ba3d6;
+}
+
+/* Une tâche en retard garde la couleur de son statut mais est entourée de rouge. */
+.calendar-event.overdue,
+.calendar-dot.overdue {
+  box-shadow: inset 0 0 0 2px #e2574c;
+}
+
+/* Le point "Overdue" de la légende : seulement le contour rouge, sans remplissage. */
+.calendar-dot.ring {
+  background: transparent;
 }
 
 /* La légende sous la grille. */

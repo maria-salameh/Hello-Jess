@@ -7,7 +7,7 @@ import { api, errorMessages, type CalendarEvent, type CalendarResponse } from ".
 import Chip from "../components/Chip";
 import ErrorList from "../components/ErrorList";
 import TopNav from "../components/TopNav";
-import { EVENT_COLORS, TYPE_LABEL, eventColor } from "../utils/calendar";
+import { EVENT_COLORS, describeEvent, eventColor, isOverdue } from "../utils/calendar";
 import {
   addDays,
   addMonths,
@@ -113,8 +113,12 @@ export default function CalendarScreen() {
                 >
                   <Text style={[styles.calDayNumber, day === today && styles.calDayNumberToday]}>{dayOfMonth(day)}</Text>
                   <View style={styles.calDots}>
+                    {/* Un point par événement, de la couleur du statut ; entouré de rouge si la tâche est en retard. */}
                     {eventsOfDay.slice(0, MAX_DOTS).map((event, index) => (
-                      <View key={index} style={[styles.calDot, { backgroundColor: eventColor(event, today) }]} />
+                      <View
+                        key={index}
+                        style={[styles.calDot, { backgroundColor: eventColor(event) }, isOverdue(event, today) && styles.calDotOverdue]}
+                      />
                     ))}
                   </View>
                 </TouchableOpacity>
@@ -124,14 +128,14 @@ export default function CalendarScreen() {
         ))}
       </View>
 
-      {/* La légende des couleurs. */}
+      {/* La légende des couleurs : une par statut, une pour les habitudes, et le contour rouge du retard. */}
       <View style={styles.calLegend}>
         {(
           [
-            ["Task due", EVENT_COLORS.due],
-            ["Overdue", EVENT_COLORS.overdue],
-            ["Task completed", EVENT_COLORS.done],
-            ["Habit done", EVENT_COLORS.habit],
+            ["To do", EVENT_COLORS.todo],
+            ["Doing", EVENT_COLORS.doing],
+            ["Done", EVENT_COLORS.done],
+            ["Habit", EVENT_COLORS.habit],
           ] as const
         ).map(([label, color]) => (
           <View key={label} style={styles.calLegendItem}>
@@ -139,6 +143,10 @@ export default function CalendarScreen() {
             <Text style={styles.statsNote}>{label}</Text>
           </View>
         ))}
+        <View style={styles.calLegendItem}>
+          <View style={[styles.calDot, styles.calDotOverdue, { backgroundColor: "transparent" }]} />
+          <Text style={styles.statsNote}>Overdue (red outline)</Text>
+        </View>
       </View>
 
       {/* Le détail du jour touché : chaque événement avec sa couleur ; les tâches ouvrent leur écran de détail. */}
@@ -153,14 +161,12 @@ export default function CalendarScreen() {
               style={styles.calDayItem}
               onPress={() => (event.taskId ? navigation.navigate("TaskDetail", { id: event.taskId }) : navigation.navigate("Habits"))}
             >
-              <View style={[styles.calDot, { backgroundColor: eventColor(event, today), marginTop: 5 }]} />
+              <View
+                style={[styles.calDot, { backgroundColor: eventColor(event), marginTop: 5 }, isOverdue(event, today) && styles.calDotOverdue]}
+              />
               <View style={{ flex: 1 }}>
                 <Text style={styles.taskTitle}>{event.title}</Text>
-                <Text style={styles.statsNote}>
-                  {TYPE_LABEL[event.type]}
-                  {event.priority && event.type === "task-due" ? ` · ${event.priority} priority` : ""}
-                  {event.status === "doing" ? " · in progress" : ""}
-                </Text>
+                <Text style={styles.statsNote}>{describeEvent(event, today)}</Text>
               </View>
             </TouchableOpacity>
           ))

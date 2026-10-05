@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, errorMessages, type CalendarEvent, type CalendarResponse } from "../api";
 import AppHeader from "../components/AppHeader";
-import CalendarView, { eventClass } from "../components/CalendarView";
+import CalendarView, { describeEvent, eventClass } from "../components/CalendarView";
 import ErrorList from "../components/ErrorList";
 import {
   addMonths,
@@ -17,13 +17,6 @@ import {
   startOfWeek,
   todayLocal,
 } from "../utils/dates";
-
-// Le texte qui décrit le type d'un événement dans la liste du jour.
-const TYPE_LABEL: Record<CalendarEvent["type"], string> = {
-  "task-due": "Task due",
-  "task-done": "Task completed",
-  habit: "Habit done",
-};
 
 export default function Calendar() {
   const today = todayLocal();
@@ -108,11 +101,7 @@ export default function Calendar() {
                       {event.title}
                     </Link>
                   )}
-                  <span className="stats-note">
-                    {TYPE_LABEL[event.type]}
-                    {event.priority && event.type === "task-due" ? ` · ${event.priority} priority` : ""}
-                    {event.status === "doing" ? " · in progress" : ""}
-                  </span>
+                  <span className="stats-note">{describeEvent(event, today)}</span>
                 </div>
               </li>
             ))}

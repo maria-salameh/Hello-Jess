@@ -4,13 +4,38 @@ HelloJess is a task and habit tracker (the **TaskFlow** subject, with all four b
 
 It is built as three pieces sharing one backend: a **Node.js/Express API** (MongoDB), a **React web app**, and a **React Native (Expo) mobile app**.
 
-| Tasks | Calendar |
-| --- | --- |
-| ![Tasks](docs/tasks.png) | ![Calendar](docs/calendar.png) |
+## Screenshots
 
-| Habits | Statistics |
+### Web app
+
+| Tasks: filters, counter, overdue tasks | Task detail and edit |
+| --- | --- |
+| ![Tasks](docs/tasks.png) | ![Task detail](docs/task-detail.png) |
+
+| Validation messages | Calendar |
+| --- | --- |
+| ![Validation error on an empty title](docs/validation.png) | ![Calendar](docs/calendar.png) |
+
+| Habits | Statistics: heatmap and completion rate |
 | --- | --- |
 | ![Habits](docs/habits.png) | ![Statistics](docs/statistics.png) |
+
+### Mobile app (React Native / Expo)
+
+<table>
+  <tr>
+    <th>Tasks</th>
+    <th>Calendar</th>
+    <th>Habits</th>
+    <th>Statistics</th>
+  </tr>
+  <tr>
+    <td><img src="docs/mobile-tasks.png" alt="Mobile tasks" width="200"></td>
+    <td><img src="docs/mobile-calendar.png" alt="Mobile calendar" width="200"></td>
+    <td><img src="docs/mobile-habits.png" alt="Mobile habits" width="200"></td>
+    <td><img src="docs/mobile-statistics.png" alt="Mobile statistics" width="200"></td>
+  </tr>
+</table>
 
 ## What is implemented
 
@@ -25,7 +50,11 @@ It is built as three pieces sharing one backend: a **Node.js/Express API** (Mong
 | **B3** | GitHub-style **heatmap**: daily aggregation of completed tasks and habit completions, calendar grid, legend, days with no activity shown, time zones handled |
 | **B4** | **Statistics**: weekly (or monthly) completion rate, evolution versus the previous period, with documented and unit-tested calculations |
 
-**Extra** — a **calendar** page (web and mobile): a month grid where tasks due (purple, red when overdue), tasks completed (green) and habits done (blue) are marked in their own colour, with the day's events listed below.
+**Extra** — a **calendar** page (web and mobile): a month grid with a colour per kind of event, and the selected day's events listed below.
+
+- Open tasks appear on their due date, or on the day they were added when they have no due date, so a new task always shows up.
+- Tasks are coloured by status: **to do** purple, **doing** orange, **done** green (shown on the day they were completed). **Habits** are blue.
+- A task whose due date has passed keeps its status colour with a **red outline**. Overdue tasks that are due before the visible grid (for example last month) are carried onto today, so they are never hidden.
 
 ## Structure
 
@@ -63,7 +92,7 @@ cd backend
 npm test
 ```
 
-45 tests (Node's built-in test runner, no database needed) cover the date utilities (leap years, weeks, daylight-saving changes), the validation rules of every field, the heatmap, the completion-rate calculations and the calendar events.
+53 tests (Node's built-in test runner, no database needed) cover the date utilities (leap years, weeks, daylight-saving changes), the validation rules of every field, the heatmap, the completion-rate calculations and the calendar events.
 
 ## The `Task` model
 
@@ -91,7 +120,7 @@ All routes except register, login and `/health` need the header `Authorization: 
 | `POST /api/tasks` · `GET /api/tasks/:id` · `PATCH /api/tasks/:id` · `DELETE /api/tasks/:id` | Create, detail, edit (only the fields sent change), delete |
 | `GET /api/habits` · `POST /api/habits` · `GET`/`PATCH`/`DELETE /api/habits/:id` | Habits (`?from=&to=` adds the days each one was done). Deleting a habit deletes its events |
 | `GET /api/habits/:id/events` · `POST /api/habits/:id/events` · `DELETE /api/habits/:id/events/:date` | Dated completions (`{ "date": "2026-10-05" }`, one per habit per day) |
-| `GET /api/calendar?from=&to=&tz=` | Calendar events for a period (at most 62 days) |
+| `GET /api/calendar?from=&to=&tz=` | Calendar events for a period (at most 62 days): open tasks (with their `status`), overdue tasks carried onto today, completed tasks and habit completions |
 | `GET /api/stats/heatmap?from=&to=&tz=` | Heatmap data (default: the last 52 weeks, at most 366 days) |
 | `GET /api/stats/completion?period=week\|month&count=12&tz=` | Completion rate per period |
 | `GET /health` | Is the server up? |

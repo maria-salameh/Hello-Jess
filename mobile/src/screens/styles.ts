@@ -653,9 +653,14 @@ export const styles = StyleSheet.create({
     gap: 3,
   },
   calDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  // Une tâche en retard garde la couleur de son statut mais est entourée de rouge.
+  calDotOverdue: {
+    borderWidth: 2,
+    borderColor: colors.danger,
   },
   // La légende sous la grille et un point de couleur (donné en ligne).
   calLegend: {

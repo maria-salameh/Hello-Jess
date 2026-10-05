@@ -78,12 +78,16 @@ export type Habit = {
   completions?: string[];
 };
 
-// Un événement du calendrier : une tâche à faire ("task-due"), une tâche terminée ("task-done")
-// ou une habitude réalisée ("habit"), à une date civile donnée.
+// Un événement du calendrier à une date civile donnée : une tâche ouverte à son échéance ("task-due"),
+// une tâche en retard dont l'échéance est avant la période affichée, reportée sur aujourd'hui ("task-overdue",
+// avec sa vraie échéance dans "dueDate"), une tâche ouverte sans échéance au jour où elle a été ajoutée
+// ("task-undated"), une tâche terminée ("task-done") ou une habitude réalisée ("habit").
+// Pour une tâche, "status" décide de la couleur.
 export type CalendarEvent = {
   date: string;
-  type: "task-due" | "task-done" | "habit";
+  type: "task-due" | "task-overdue" | "task-undated" | "task-done" | "habit";
   title: string;
+  dueDate?: string;
   taskId?: string;
   habitId?: string;
   status?: TaskStatus;
