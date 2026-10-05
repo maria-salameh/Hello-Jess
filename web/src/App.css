@@ -1,3 +1,6 @@
+/* ===== Pages de connexion et d'inscription ===== */
+
+/* Fond de page de connexion/inscription : la carte est centrée au milieu de l'écran. */
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -6,6 +9,7 @@
   padding: 24px;
 }
 
+/* La carte blanche (ou sombre) qui contient le formulaire. */
 .auth-card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -19,16 +23,19 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
+/* Le titre "HelloJess" en couleur d'accent. */
 .auth-card h1 {
   margin: 0;
   color: var(--accent);
 }
 
+/* Petite phrase grise sous le titre (aussi utilisée sur la page des tâches). */
 .subtitle {
   margin: 0;
   color: var(--muted);
 }
 
+/* Chaque champ du formulaire : le libellé au-dessus, le champ en dessous. */
 .auth-card label {
   display: flex;
   flex-direction: column;
@@ -37,6 +44,7 @@
   color: var(--muted);
 }
 
+/* Aspect des champs de saisie (formulaires de connexion/inscription et d'ajout de tâche). */
 .auth-card input,
 .add-task-form input,
 .add-task-form select {
@@ -48,6 +56,7 @@
   font-size: 15px;
 }
 
+/* Le bouton principal (Log in / Sign up / Add) : fond de la couleur d'accent, texte blanc. */
 .auth-card button,
 .add-task-form button {
   background: var(--accent);
@@ -59,11 +68,13 @@
   font-weight: 600;
 }
 
+/* Le bouton s'assombrit un peu quand la souris passe dessus. */
 .auth-card button:hover,
 .add-task-form button:hover {
   background: var(--accent-hover);
 }
 
+/* Message d'erreur rouge au-dessus du formulaire. */
 .error {
   background: rgba(226, 87, 76, 0.12);
   color: var(--danger);
@@ -72,6 +83,7 @@
   font-size: 14px;
 }
 
+/* Phrase sous le formulaire ("No account? Sign up" / "Already have an account? Log in"). */
 .switch {
   text-align: center;
   font-size: 14px;
@@ -79,16 +91,21 @@
   margin: 0;
 }
 
+/* Le lien dans cette phrase. */
 .switch a {
   color: var(--accent);
 }
 
+/* ===== Page des tâches ===== */
+
+/* Colonne centrée, de largeur limitée, qui contient toute la page des tâches. */
 .tasks-page {
   max-width: 640px;
   margin: 0 auto;
   padding: 32px 20px 80px;
 }
 
+/* En-tête : titre et bienvenue à gauche, bouton de déconnexion à droite. */
 .tasks-header {
   display: flex;
   justify-content: space-between;
@@ -96,11 +113,13 @@
   margin-bottom: 24px;
 }
 
+/* Le titre "HelloJess" de l'en-tête. */
 .tasks-header h1 {
   margin: 0;
   color: var(--accent);
 }
 
+/* Le bouton "Log out" : discret, juste une bordure. */
 .logout-btn {
   background: transparent;
   border: 1px solid var(--border);
@@ -110,6 +129,7 @@
   font-size: 14px;
 }
 
+/* Formulaire d'ajout de tâche : les champs sont alignés sur une ligne et passent à la ligne si l'écran est étroit. */
 .add-task-form {
   display: flex;
   gap: 8px;
@@ -117,11 +137,13 @@
   flex-wrap: wrap;
 }
 
+/* Le champ du titre prend toute la place disponible. */
 .add-task-form input[type="text"] {
   flex: 1;
   min-width: 160px;
 }
 
+/* La case à cocher "Show completed". */
 .show-completed {
   display: flex;
   align-items: center;
@@ -131,12 +153,16 @@
   margin-bottom: 16px;
 }
 
+/* Messages "Loading..." et "No tasks yet". */
 .empty-state {
   color: var(--muted);
   text-align: center;
   padding: 40px 0;
 }
 
+/* ===== Liste des tâches ===== */
+
+/* La liste : pas de puces, les tâches sont empilées avec un petit espace entre elles. */
 .task-list {
   list-style: none;
   margin: 0;
@@ -146,6 +172,7 @@
   gap: 8px;
 }
 
+/* Une tâche : une carte avec une bordure colorée à gauche (la couleur dépend de la priorité, voir plus bas). */
 .task-item {
   display: flex;
   align-items: flex-start;
@@ -157,6 +184,7 @@
   padding: 12px 14px;
 }
 
+/* Couleur de la bordure gauche selon la priorité : rouge, orange ou vert. */
 .task-item.priority-high {
   border-left-color: #e2574c;
 }
@@ -167,34 +195,41 @@
   border-left-color: #4caf82;
 }
 
+/* Une tâche terminée est grisée... */
 .task-item.completed {
   opacity: 0.55;
 }
 
+/* ...et son titre est barré. */
 .task-item.completed .task-title {
   text-decoration: line-through;
 }
 
+/* La case à cocher de la tâche. */
 .task-checkbox input {
   width: 18px;
   height: 18px;
   margin-top: 2px;
 }
 
+/* La partie centrale (titre, notes, priorité, date) prend toute la place disponible. */
 .task-body {
   flex: 1;
 }
 
+/* Le titre de la tâche, en gras. */
 .task-title {
   font-weight: 600;
 }
 
+/* Les notes, en petit et en gris. */
 .task-notes {
   font-size: 13px;
   color: var(--muted);
   margin-top: 2px;
 }
 
+/* La ligne sous le titre : pastille de priorité et date limite côte à côte. */
 .task-meta {
   display: flex;
   gap: 8px;
@@ -202,6 +237,7 @@
   margin-top: 6px;
 }
 
+/* La petite pastille arrondie qui affiche la priorité. */
 .badge {
   font-size: 11px;
   text-transform: uppercase;
@@ -212,6 +248,7 @@
   color: var(--muted);
 }
 
+/* Couleur de la pastille selon la priorité. */
 .badge-high {
   background: rgba(226, 87, 76, 0.15);
   color: #e2574c;
@@ -225,11 +262,13 @@
   color: #368a63;
 }
 
+/* La date limite ("Due ..."). */
 .due-date {
   font-size: 12px;
   color: var(--muted);
 }
 
+/* Le bouton "×" de suppression : sans fond, gris. */
 .delete-btn {
   background: transparent;
   border: none;
@@ -239,6 +278,7 @@
   padding: 4px;
 }
 
+/* Il devient rouge au survol pour montrer qu'il supprime. */
 .delete-btn:hover {
   color: var(--danger);
 }

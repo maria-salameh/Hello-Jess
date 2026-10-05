@@ -1,5 +1,9 @@
+/* Styles globaux : les couleurs sont définies une seule fois ici sous forme de variables (--nom)
+   que le reste du CSS réutilise avec var(--nom). */
 :root {
+  /* Le navigateur peut afficher les contrôles de formulaire en clair ou en sombre selon le thème. */
   color-scheme: light dark;
+  /* Palette du thème clair : fond de page, fond des cartes, texte, texte atténué, couleur d'accent, bordures, erreurs. */
   --bg: #f6f5f3;
   --card: #ffffff;
   --text: #1c1b1a;
@@ -11,6 +15,7 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* Si l'ordinateur ou le téléphone est en mode sombre, on remplace les couleurs claires par une palette sombre. */
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #17161a;
@@ -21,16 +26,19 @@
   }
 }
 
+/* La largeur et la hauteur d'un élément incluent son padding et sa bordure (plus facile à dimensionner). */
 * {
   box-sizing: border-box;
 }
 
+/* Page entière : pas de marge par défaut, couleurs de fond et de texte du thème. */
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
 }
 
+/* Tous les boutons : même police que le reste de la page et curseur en forme de main. */
 button {
   font-family: inherit;
   cursor: pointer;
