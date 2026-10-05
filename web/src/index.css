@@ -12,6 +12,12 @@
   --accent-hover: #5a4bd1;
   --border: #e6e3de;
   --danger: #e2574c;
+  /* Les 5 couleurs de la heatmap, du jour sans activité (0) au jour le plus actif (4). */
+  --heat-0: #e9e7f4;
+  --heat-1: #c9c2f5;
+  --heat-2: #a396ee;
+  --heat-3: #7f6ee9;
+  --heat-4: #5a46d6;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -23,6 +29,11 @@
     --text: #f2f0ef;
     --muted: #a29e9b;
     --border: #33313a;
+    --heat-0: #2a2832;
+    --heat-1: #3d3680;
+    --heat-2: #5546b8;
+    --heat-3: #6c5ce7;
+    --heat-4: #9d90ff;
   }
 }
 

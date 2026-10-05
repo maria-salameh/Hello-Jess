@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "node --watch src/services/server.js",
-    "start": "node src/services/server.js"
+    "start": "node src/services/server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

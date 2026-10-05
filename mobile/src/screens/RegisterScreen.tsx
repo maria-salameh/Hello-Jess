@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { errorMessages } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "./styles";
 
@@ -29,9 +30,9 @@ export default function RegisterScreen({ navigation }: any) {
     setSubmitting(true);
     try {
       await register(email, name, password);
-    } catch {
-      // Toute erreur affiche ce même message (la vraie raison renvoyée par le backend n'est pas montrée).
-      setError("Could not create account. That email may already be registered.");
+    } catch (err) {
+      // Affiche la vraie raison renvoyée par le backend (ex. "Email already registered") ou "serveur injoignable".
+      setError(errorMessages(err).join(" "));
     } finally {
       setSubmitting(false);
     }

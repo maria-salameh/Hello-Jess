@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { errorMessages } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -25,8 +26,9 @@ export default function Login() {
       await login(email, password);
       // Succès : on va à la liste des tâches.
       navigate("/");
-    } catch {
-      setError("Incorrect email or password.");
+    } catch (err) {
+      // Affiche la vraie raison renvoyée par le backend (ex. mauvais identifiants) ou "serveur injoignable".
+      setError(errorMessages(err).join(" "));
     } finally {
       setSubmitting(false);
     }

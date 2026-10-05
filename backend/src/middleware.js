@@ -2,13 +2,23 @@
 import { User } from "./models/User.js";
 import { decodeAccessToken } from "./security.js";
 
+// Réponse 422 standard : un message général et la liste des champs en erreur, par exemple
+// { detail: "Validation failed", errors: [{ field: "title", message: "title must not be empty" }] }.
+export function validationError(res, errors) {
+  return res.status(422).json({ detail: "Validation failed", errors });
+}
+
 // Crée un middleware qui vérifie le corps (ou les paramètres d'URL) de la requête avec un schéma zod.
 // En cas de succès, les données nettoyées sont gardées dans res.locals pour le contrôleur ; sinon il répond 422.
 export function validate(schema, source = "body") {
   return (req, res, next) => {
     const result = schema.safeParse(req[source]);
     if (!result.success) {
-      return res.status(422).json({ detail: result.error.issues });
+      // On transforme les erreurs zod en liste simple { field, message } facile à afficher.
+      return validationError(
+        res,
+        result.error.issues.map((issue) => ({ field: issue.path.join(".") || source, message: issue.message }))
+      );
     }
     res.locals[source] = result.data;
     next();

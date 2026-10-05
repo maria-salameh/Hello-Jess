@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { errorMessages } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "./styles";
 
@@ -28,8 +29,9 @@ export default function LoginScreen({ navigation }: any) {
     setSubmitting(true);
     try {
       await login(email, password);
-    } catch {
-      setError("Incorrect email or password.");
+    } catch (err) {
+      // Affiche la vraie raison renvoyée par le backend (ex. mauvais identifiants) ou "serveur injoignable".
+      setError(errorMessages(err).join(" "));
     } finally {
       setSubmitting(false);
     }

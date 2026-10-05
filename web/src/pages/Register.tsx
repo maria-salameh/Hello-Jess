@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { errorMessages } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
@@ -26,9 +27,9 @@ export default function Register() {
       await register(email, name, password);
       // Succès : l'utilisateur est déjà connecté, donc on va à la liste des tâches.
       navigate("/");
-    } catch {
-      // Toute erreur affiche ce même message (la vraie raison renvoyée par le backend n'est pas montrée).
-      setError("Could not create account. That email may already be registered.");
+    } catch (err) {
+      // Affiche la vraie raison renvoyée par le backend (ex. "Email already registered") ou "serveur injoignable".
+      setError(errorMessages(err).join(" "));
     } finally {
       setSubmitting(false);
     }

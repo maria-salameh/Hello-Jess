@@ -229,4 +229,450 @@ export const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 20,
   },
+  // La description d'une tâche dans la liste (limitée à 2 lignes dans le composant).
+  taskNotes: {
+    color: colors.muted,
+    fontSize: 13,
+    marginTop: 2,
+  },
+  // La ligne sous le titre : statut, priorité et échéance côte à côte.
+  taskMeta: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 6,
+  },
+  // Le bouton arrondi qui affiche le statut ; appuyer dessus passe au statut suivant.
+  statusPill: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+  },
+  statusPillText: {
+    color: colors.muted,
+    fontSize: 11,
+    textTransform: "uppercase",
+  },
+  // La date limite, et sa version rouge quand elle est dépassée.
+  dueText: {
+    color: colors.muted,
+    fontSize: 12,
+  },
+  dueTextOverdue: {
+    color: colors.danger,
+    fontWeight: "600",
+  },
+
+  // ----- Menu de navigation (Tasks / Habits / Statistics) -----
+
+  // La rangée du menu sous l'en-tête.
+  nav: {
+    flexDirection: "row",
+    gap: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  // Un onglet du menu, et son aspect quand c'est la page courante (souligné en couleur d'accent).
+  navItem: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+    marginBottom: -1,
+  },
+  navItemActive: {
+    borderBottomColor: colors.accent,
+  },
+  navText: {
+    color: colors.muted,
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  navTextActive: {
+    color: colors.accent,
+  },
+
+  // ----- Boutons-filtres ("chips") et formulaires -----
+
+  // Une rangée de petits boutons qui passe à la ligne si elle est trop longue.
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    alignItems: "center",
+  },
+  // Un petit bouton arrondi, et son aspect quand il est choisi.
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  chipActive: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  chipText: {
+    color: colors.muted,
+    fontSize: 13,
+  },
+  chipTextActive: {
+    color: "#fff",
+  },
+  // Le petit nombre affiché dans un bouton-filtre (le compteur de tâches).
+  chipCount: {
+    color: colors.muted,
+    fontSize: 11,
+    backgroundColor: "rgba(127,127,127,0.25)",
+    paddingHorizontal: 6,
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+  // Petit titre au-dessus d'une rangée de filtres ou de choix.
+  groupLabel: {
+    color: colors.muted,
+    fontSize: 12,
+    marginTop: 4,
+  },
+  // Champ de texte sur plusieurs lignes (description d'une tâche).
+  textArea: {
+    minHeight: 90,
+    textAlignVertical: "top",
+  },
+  // Message vert de confirmation ("Saved.").
+  success: {
+    backgroundColor: "rgba(76,175,130,0.15)",
+    color: "#4caf82",
+    padding: 8,
+    borderRadius: 8,
+    fontSize: 13,
+  },
+  // Bouton de suppression : transparent avec un contour rouge.
+  dangerButton: {
+    borderWidth: 1,
+    borderColor: colors.danger,
+    borderRadius: 10,
+    padding: 12,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  dangerText: {
+    color: colors.danger,
+    fontWeight: "600",
+    fontSize: 15,
+  },
+  // Les dates gérées par le serveur (création, modification, fin) dans la page de détail.
+  detailMeta: {
+    color: colors.muted,
+    fontSize: 12,
+  },
+  // Lien "Back to tasks" en haut de la page de détail.
+  backLink: {
+    color: colors.accent,
+    fontSize: 14,
+    marginBottom: 4,
+  },
+
+  // ----- Habitudes -----
+
+  // Une habitude : une carte avec son nom en haut et les 7 derniers jours en dessous.
+  habitCard: {
+    backgroundColor: colors.card,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+    gap: 12,
+  },
+  habitHead: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  // La rangée des 7 jours.
+  habitDays: {
+    flexDirection: "row",
+    gap: 6,
+  },
+  // Un jour : petit bouton avec le jour de la semaine et le numéro. Plein quand l'habitude est réalisée ;
+  // aujourd'hui est entouré de la couleur d'accent.
+  habitDay: {
+    flex: 1,
+    alignItems: "center",
+    gap: 2,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  habitDayDone: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  habitDayToday: {
+    borderColor: colors.accent,
+    borderWidth: 2,
+  },
+  habitDayWeekday: {
+    color: colors.muted,
+    fontSize: 11,
+  },
+  habitDayNumber: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
+  // ----- Statistiques -----
+
+  // Une carte de la page des statistiques (heatmap ou graphique).
+  statsCard: {
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 16,
+    gap: 8,
+  },
+  statsHeading: {
+    color: colors.text,
+    fontSize: 17,
+    fontWeight: "700",
+  },
+  statsNote: {
+    color: colors.muted,
+    fontSize: 12,
+  },
+  // Les trois chiffres résumés sous la heatmap.
+  statsSummary: {
+    flexDirection: "row",
+    gap: 24,
+    flexWrap: "wrap",
+    marginTop: 6,
+  },
+  statsSummaryValue: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  statsSummaryLabel: {
+    color: colors.muted,
+    fontSize: 12,
+  },
+
+  // ----- Heatmap -----
+
+  // La grille et les noms de jours à sa gauche (qui ne défilent pas).
+  heatmapRow: {
+    flexDirection: "row",
+    gap: 6,
+  },
+  // Les noms des jours : 7 lignes de la même hauteur que les cases ; la première ligne est décalée sous les noms de mois.
+  heatmapWeekdays: {
+    marginTop: 16,
+    gap: 3,
+    width: 26,
+  },
+  heatmapWeekdayLabel: {
+    height: 12,
+    lineHeight: 12,
+    fontSize: 9,
+    color: colors.muted,
+  },
+  // La rangée des noms de mois : chaque nom est placé à la bonne colonne avec "left".
+  heatmapMonths: {
+    height: 16,
+    position: "relative",
+  },
+  heatmapMonthLabel: {
+    position: "absolute",
+    top: 0,
+    fontSize: 10,
+    color: colors.muted,
+  },
+  // Une colonne = une semaine (7 cases empilées).
+  heatmapColumn: {
+    gap: 3,
+  },
+  // Une case (un jour) ; sa couleur est donnée selon le niveau d'intensité.
+  heatmapCell: {
+    width: 12,
+    height: 12,
+    borderRadius: 2,
+  },
+  // Le jour touché, entouré pour le repérer.
+  heatmapCellSelected: {
+    borderWidth: 1,
+    borderColor: colors.text,
+  },
+  // La légende "Less ... More".
+  heatmapLegend: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 4,
+  },
+
+  // ----- Graphique du taux de complétion -----
+
+  // Les barres sont alignées en bas, une colonne par période (le graphique défile s'il est trop large).
+  chartRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 8,
+  },
+  chartCol: {
+    width: 40,
+    alignItems: "center",
+    gap: 2,
+  },
+  chartValue: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  // L'évolution par rapport à la période précédente : verte si elle progresse, rouge si elle recule.
+  chartChange: {
+    fontSize: 10,
+    minHeight: 12,
+  },
+  chartChangeUp: {
+    color: "#4caf82",
+  },
+  chartChangeDown: {
+    color: colors.danger,
+  },
+  // Le rail dans lequel la barre grandit : hauteur fixe, la barre est collée en bas.
+  chartTrack: {
+    height: 120,
+    width: "100%",
+    justifyContent: "flex-end",
+  },
+  chartBar: {
+    width: "100%",
+    backgroundColor: colors.accent,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+    minHeight: 3,
+  },
+  // Barre grisée : aucune tâche n'était en jeu pendant cette période.
+  chartBarEmpty: {
+    backgroundColor: colors.border,
+  },
+  chartLabel: {
+    color: colors.muted,
+    fontSize: 11,
+  },
+
+  // ----- Écrans qui défilent (détail, statistiques, calendrier) -----
+
+  // Fond d'un écran qui défile, et l'espace autour de son contenu.
+  scrollPage: {
+    flex: 1,
+    backgroundColor: colors.bg,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === "ios" ? 60 : 40,
+    paddingBottom: 60,
+    gap: 12,
+  },
+
+  // ----- Calendrier -----
+
+  // La barre au-dessus de la grille : mois précédent, nom du mois, mois suivant, "Today".
+  calToolbar: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  calTitle: {
+    flex: 1,
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  // Une ligne de la grille = une semaine (7 cases de même largeur).
+  calRow: {
+    flexDirection: "row",
+  },
+  // La rangée des noms de jours (Mon ... Sun).
+  calWeekdayLabel: {
+    flex: 1,
+    textAlign: "center",
+    color: colors.muted,
+    fontSize: 11,
+    paddingBottom: 4,
+  },
+  // Une case (un jour) : le numéro en haut, puis les points de couleur des événements.
+  calCell: {
+    flex: 1,
+    minHeight: 54,
+    padding: 3,
+    gap: 3,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.card,
+  },
+  // Les jours des mois voisins sont atténués ; aujourd'hui a un numéro dans une pastille ; le jour choisi est entouré.
+  calCellOutside: {
+    opacity: 0.4,
+  },
+  calCellSelected: {
+    borderColor: colors.accent,
+    borderWidth: 2,
+  },
+  calDayNumber: {
+    alignSelf: "flex-start",
+    minWidth: 18,
+    height: 18,
+    lineHeight: 18,
+    textAlign: "center",
+    borderRadius: 9,
+    overflow: "hidden",
+    color: colors.text,
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  calDayNumberToday: {
+    backgroundColor: colors.accent,
+    color: "#fff",
+  },
+  // Les points de couleur : un par événement (les premiers seulement), qui passent à la ligne.
+  calDots: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 3,
+  },
+  calDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  // La légende sous la grille et un point de couleur (donné en ligne).
+  calLegend: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 14,
+  },
+  calLegendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  // Une ligne de la liste des événements du jour.
+  calDayItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+    paddingVertical: 4,
+  },
 });

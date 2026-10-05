@@ -129,28 +129,113 @@
   font-size: 14px;
 }
 
-/* Formulaire d'ajout de tâche : les champs sont alignés sur une ligne et passent à la ligne si l'écran est étroit. */
+/* Formulaire d'ajout : les lignes de champs sont empilées les unes sous les autres. */
 .add-task-form {
   display: flex;
+  flex-direction: column;
   gap: 8px;
   margin-bottom: 12px;
+}
+
+/* Une ligne de champs côte à côte (elle passe à la ligne si l'écran est étroit). */
+.form-row {
+  display: flex;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
-/* Le champ du titre prend toute la place disponible. */
-.add-task-form input[type="text"] {
+/* Dans une ligne, les champs de texte prennent toute la place disponible. */
+.form-row input[type="text"],
+.form-row select,
+.form-row input[type="date"] {
   flex: 1;
-  min-width: 160px;
+  min-width: 140px;
 }
 
-/* La case à cocher "Show completed". */
-.show-completed {
+/* ===== Menu de navigation (Tasks / Habits / Statistics) ===== */
+
+.main-nav {
   display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Un lien du menu ; celui de la page courante est souligné avec la couleur d'accent. */
+.main-nav a {
+  padding: 8px 14px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.main-nav a.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ===== Filtres de la liste de tâches ===== */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* Les boutons "All / To do / Doing / Done" avec leur compteur. */
+.chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  background: transparent;
+  border: 1px solid var(--border);
   color: var(--muted);
-  margin-bottom: 16px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+/* Le bouton du filtre actuellement choisi. */
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* Le petit nombre de tâches affiché dans le bouton. */
+.chip-count {
+  font-size: 11px;
+  background: rgba(127, 127, 127, 0.25);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+/* Les deux menus déroulants de filtre (priorité et échéance). */
+.filter-selects {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-selects select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 13px;
 }
 
 /* Messages "Loading..." et "No tasks yet". */
@@ -217,16 +302,38 @@
   flex: 1;
 }
 
-/* Le titre de la tâche, en gras. */
+/* Le titre de la tâche, en gras ; c'est un lien vers sa page de détail. */
 .task-title {
   font-weight: 600;
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 
-/* Les notes, en petit et en gris. */
+.task-title:hover {
+  text-decoration: underline;
+}
+
+/* La description, en petit et en gris ; limitée à 2 lignes dans la liste. */
 .task-notes {
   font-size: 13px;
   color: var(--muted);
   margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Le petit menu qui permet de changer le statut d'une tâche directement dans la liste. */
+.status-select {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
 }
 
 /* La ligne sous le titre : pastille de priorité et date limite côte à côte. */
@@ -268,6 +375,12 @@
   color: var(--muted);
 }
 
+/* Une échéance dépassée est affichée en rouge. */
+.due-date.overdue {
+  color: var(--danger);
+  font-weight: 600;
+}
+
 /* Le bouton "×" de suppression : sans fond, gris. */
 .delete-btn {
   background: transparent;
@@ -281,4 +394,532 @@
 /* Il devient rouge au survol pour montrer qu'il supprime. */
 .delete-btn:hover {
   color: var(--danger);
+}
+
+/* ===== Page de détail d'une tâche ===== */
+
+/* Le lien "Back to tasks". */
+.back-link {
+  display: inline-block;
+  margin-bottom: 14px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* La carte qui contient le formulaire de modification. */
+.detail-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.detail-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--muted);
+  flex: 1;
+}
+
+.detail-card input,
+.detail-card select,
+.detail-card textarea {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+}
+
+/* Les boutons du formulaire : "Save changes" en couleur d'accent... */
+.detail-card button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ...et "Delete task" en rouge. */
+.detail-card button.danger-btn {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+/* Les dates gérées par le serveur (création, modification, fin), en petit et en gris. */
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Message vert "Saved." */
+.success {
+  background: rgba(76, 175, 130, 0.15);
+  color: #368a63;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* ===== Habitudes ===== */
+
+/* Une habitude : une carte avec son nom en haut et les 7 derniers jours en dessous. */
+.habit-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.habit-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* La rangée des 7 jours. */
+.habit-days {
+  display: flex;
+  gap: 6px;
+}
+
+/* Un jour : petit bouton avec le jour de la semaine et le numéro. Plein quand l'habitude est réalisée. */
+.habit-day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.habit-day strong {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.habit-day.done {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.habit-day.done strong {
+  color: white;
+}
+
+/* Aujourd'hui est entouré. */
+.habit-day.today {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ===== Statistiques ===== */
+
+/* La page des statistiques est plus large pour que la heatmap tienne mieux. */
+.stats-page {
+  max-width: 900px;
+}
+
+.stats-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.stats-card h2 {
+  margin: 0 0 4px;
+  font-size: 17px;
+}
+
+.stats-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Phrase d'explication sous un titre de carte. */
+.stats-note {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Les trois chiffres résumés sous la heatmap. */
+.stats-summary {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.stats-summary div {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-summary strong {
+  font-size: 20px;
+}
+
+.stats-summary span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ===== Heatmap ===== */
+
+/* La zone de la heatmap peut défiler horizontalement sur un petit écran. */
+.heatmap-scroll {
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+/* Le contenu garde sa largeur naturelle (sinon il serait écrasé au lieu de défiler). */
+.heatmap-inner {
+  width: max-content;
+}
+
+/* La rangée des noms de mois : chaque nom est placé à la bonne colonne avec "left". */
+.heatmap-months {
+  position: relative;
+  height: 16px;
+  margin-left: 34px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.heatmap-months span {
+  position: absolute;
+  top: 0;
+}
+
+.heatmap-body {
+  display: flex;
+  gap: 6px;
+}
+
+/* Les noms des jours à gauche : 7 lignes de la même hauteur que les cases.
+   "sticky" les garde visibles à gauche quand la grille défile horizontalement. */
+.heatmap-weekdays {
+  display: grid;
+  grid-template-rows: repeat(7, 12px);
+  gap: 3px;
+  width: 28px;
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--muted);
+  position: sticky;
+  left: 0;
+  background: var(--card);
+  z-index: 1;
+}
+
+/* La grille : 7 lignes (lundi à dimanche) ; les cases se remplissent colonne par colonne, une colonne par semaine. */
+.heatmap-grid {
+  display: grid;
+  grid-template-rows: repeat(7, 12px);
+  grid-auto-flow: column;
+  grid-auto-columns: 12px;
+  gap: 3px;
+}
+
+/* Une case (un jour). */
+.heatmap-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* Case vide qui sert seulement à aligner la première et la dernière semaine. */
+.heatmap-cell.empty {
+  background: transparent;
+}
+
+/* Les 5 niveaux d'intensité : 0 = aucune activité, 4 = le jour le plus actif. */
+.heatmap-cell.level-0 {
+  background: var(--heat-0);
+}
+.heatmap-cell.level-1 {
+  background: var(--heat-1);
+}
+.heatmap-cell.level-2 {
+  background: var(--heat-2);
+}
+.heatmap-cell.level-3 {
+  background: var(--heat-3);
+}
+.heatmap-cell.level-4 {
+  background: var(--heat-4);
+}
+
+/* La légende "Less ... More" sous la grille. */
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ===== Calendrier ===== */
+
+/* La barre au-dessus de la grille : mois précédent, nom du mois, mois suivant, "Today". */
+.calendar-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.calendar-toolbar h2 {
+  margin: 0 auto 0 6px;
+  font-size: 18px;
+}
+
+.calendar {
+  margin-bottom: 18px;
+}
+
+/* La ligne des noms de jours (Mon ... Sun) : 7 colonnes de même largeur. */
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+/* La grille : 7 colonnes, avec un fin quadrillage grâce au fond et à l'espace d'1 pixel entre les cases. */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Une case (un jour) : le numéro en haut, puis les événements l'un sous l'autre. */
+.calendar-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-height: 92px;
+  padding: 4px;
+  background: var(--card);
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  text-align: left;
+  font-size: 12px;
+  min-width: 0;
+}
+
+/* Les jours des mois voisins sont atténués. */
+.calendar-cell.outside {
+  opacity: 0.45;
+}
+
+/* Aujourd'hui : numéro dans une pastille de la couleur d'accent. */
+.calendar-cell.today .calendar-day-number {
+  background: var(--accent);
+  color: white;
+}
+
+/* Le jour sélectionné est entouré. */
+.calendar-cell.selected {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.calendar-day-number {
+  align-self: flex-start;
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Un événement : une petite étiquette colorée avec le titre (coupé avec "..." s'il est trop long). */
+.calendar-event {
+  display: block;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* "+ 2 more" quand il y a plus d'événements que la case n'en montre. */
+.calendar-more {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Les couleurs des événements (utilisées par les étiquettes et les points de la légende / de la liste du jour). */
+.calendar-event.due,
+.calendar-dot.due {
+  background: var(--accent);
+}
+.calendar-event.overdue,
+.calendar-dot.overdue {
+  background: #e2574c;
+}
+.calendar-event.done,
+.calendar-dot.done {
+  background: #4caf82;
+}
+.calendar-event.habit,
+.calendar-dot.habit {
+  background: #2ba3d6;
+}
+
+/* La légende sous la grille. */
+.calendar-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Un petit rond de couleur. */
+.calendar-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+/* La liste des événements du jour sélectionné. */
+.calendar-day-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.calendar-day-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.calendar-day-list li > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-day-list .calendar-dot {
+  margin-top: 5px;
+}
+
+/* ===== Graphique du taux de complétion ===== */
+
+/* Les barres sont alignées en bas, une colonne par période. */
+.completion-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.completion-col {
+  flex: 1;
+  min-width: 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Le pourcentage au-dessus de la barre. */
+.completion-value {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* L'évolution par rapport à la période précédente : verte si elle progresse, rouge si elle recule. */
+.completion-change {
+  font-size: 10px;
+  min-height: 12px;
+}
+.completion-change.up {
+  color: #368a63;
+}
+.completion-change.down {
+  color: var(--danger);
+}
+
+/* Le rail dans lequel la barre grandit : hauteur fixe, la barre est collée en bas. */
+.completion-track {
+  height: 130px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.completion-bar {
+  width: 100%;
+  background: var(--accent);
+  border-radius: 4px 4px 0 0;
+  min-height: 3px;
+}
+
+/* Barre grisée : aucune tâche n'était en jeu pendant cette période. */
+.completion-bar.empty {
+  background: var(--border);
+}
+
+/* L'étiquette sous la barre (début de la période). */
+.completion-label {
+  font-size: 11px;
+  color: var(--muted);
 }

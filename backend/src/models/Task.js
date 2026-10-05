@@ -6,22 +6,24 @@ const taskSchema = new mongoose.Schema(
     // L'utilisateur à qui appartient la tâche (référence vers un document User). Indexé pour que
     // "toutes les tâches de cet utilisateur" soit rapide.
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
-    // Ce qu'il y a à faire.
-    title: { type: String, required: true },
-    // Détails supplémentaires facultatifs.
-    notes: { type: String, default: null },
-    // Date limite facultative.
-    due_date: { type: Date, default: null },
-    // Importance de la tâche ; seules ces trois valeurs sont acceptées.
+    // Ce qu'il y a à faire : 1 à 120 caractères une fois les espaces du début et de la fin retirés.
+    title: { type: String, required: true, trim: true, minlength: 1, maxlength: 120 },
+    // Avancement : à faire, en cours ou terminée.
+    status: { type: String, enum: ["todo", "doing", "done"], required: true },
+    // Détails facultatifs, 0 à 1000 caractères (la chaîne vide est acceptée).
+    description: { type: String, default: "", maxlength: 1000 },
+    // Échéance facultative : un jour du calendrier "YYYY-MM-DD" (sans heure, donc sans fuseau), ou null.
+    dueDate: { type: String, default: null, match: /^\d{4}-\d{2}-\d{2}$/ },
+    // Importance de la tâche (bonus B1) ; seules ces trois valeurs sont acceptées.
     priority: { type: String, enum: ["low", "medium", "high"], default: "medium" },
-    // Indique si la tâche a été cochée comme terminée.
-    completed: { type: Boolean, default: false },
+    // Moment où la tâche est passée à "done" (null sinon). Rempli par le serveur ; sert à la heatmap et aux statistiques.
+    completedAt: { type: Date, default: null },
   },
   {
     // N'ajoute pas le champ interne de version "__v" de Mongoose aux documents.
     versionKey: false,
-    // Remplit "created_at" à la création et met à jour "updated_at" à chaque modification.
-    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+    // Remplit "createdAt" à la création et met à jour "updatedAt" à chaque modification.
+    timestamps: true,
     // Définit l'aspect d'une tâche quand elle est envoyée en JSON aux applications web et mobile.
     toJSON: {
       transform(_doc, ret) {
