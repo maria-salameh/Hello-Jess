@@ -9,6 +9,9 @@ export const TOKEN_KEY = "hellojess_token";
 // Sur un téléphone, cette adresse doit être celle de l'ordinateur sur le réseau, pas "localhost".
 export const api = axios.create({
   baseURL: `${process.env.EXPO_PUBLIC_API_URL}/api`,
+  // Abandonne au bout de 10 secondes au lieu d'attendre indéfiniment quand le serveur est injoignable
+  // (sinon l'écran reste bloqué sur un indicateur de chargement).
+  timeout: 10000,
 });
 
 // S'exécute avant chaque requête : si un jeton de connexion est sauvegardé,
@@ -30,7 +33,12 @@ export function errorMessages(err: unknown): string[] {
       return data.errors.map((e: { message: string }) => e.message);
     }
     if (typeof data?.detail === "string") return [data.detail];
-    if (!err.response) return ["Could not reach the server. Check that the backend is running."];
+    // Pas de réponse : on indique l'adresse essayée, ce qui permet de repérer tout de suite une mauvaise adresse dans mobile/.env.
+    if (!err.response) {
+      return [
+        `Could not reach the server at ${process.env.EXPO_PUBLIC_API_URL}. Check that the backend is running and that your phone is on the same Wi-Fi as your computer.`,
+      ];
+    }
   }
   return ["Something went wrong. Please try again."];
 }

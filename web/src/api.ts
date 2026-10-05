@@ -4,6 +4,8 @@ import axios from "axios";
 // Client préconfiguré : chaque requête part vers <adresse du serveur définie dans web/.env>/api.
 export const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}/api`,
+  // Abandonne au bout de 10 secondes au lieu d'attendre indéfiniment quand le serveur est injoignable.
+  timeout: 10000,
 });
 
 // S'exécute avant chaque requête : si un jeton de connexion est sauvegardé dans le navigateur,
