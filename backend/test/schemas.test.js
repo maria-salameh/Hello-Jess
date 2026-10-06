@@ -7,6 +7,7 @@ import {
   habitCreateSchema,
   habitEventCreateSchema,
   heatmapQuerySchema,
+  profileUpdateSchema,
   taskCreateSchema,
   taskListQuerySchema,
   taskUpdateSchema,
@@ -19,6 +20,25 @@ const errors = (schema, data) => {
 };
 
 const validTask = { title: "Acheter du lait", status: "todo" };
+
+// ----- Profil -----
+
+test("profil : le nom (1 à 100 caractères) et l'email sont facultatifs mais valides s'ils sont envoyés", () => {
+  assert.deepEqual(errors(profileUpdateSchema, {}), []); // rien à changer
+  assert.deepEqual(errors(profileUpdateSchema, { name: "Maria", email: "maria@example.com" }), []);
+  assert.equal(profileUpdateSchema.parse({ name: "  Maria  " }).name, "Maria"); // espaces retirés
+  assert.equal(profileUpdateSchema.parse({ email: "  maria@example.com " }).email, "maria@example.com");
+  assert.deepEqual(errors(profileUpdateSchema, { name: "   " }), ["name must not be empty"]);
+  assert.deepEqual(errors(profileUpdateSchema, { name: "a".repeat(101) }), ["name must be at most 100 characters"]);
+  assert.deepEqual(errors(profileUpdateSchema, { email: "not-an-email" }), ["email must be a valid email address"]);
+  assert.deepEqual(errors(profileUpdateSchema, { email: "" }), ["email must be a valid email address"]);
+  assert.deepEqual(errors(profileUpdateSchema, { email: 42 }), ["email must be a string"]);
+});
+
+test("profil : on ne peut modifier ni le mot de passe, ni l'id, ni le propriétaire par cette route", () => {
+  const data = profileUpdateSchema.parse({ name: "Maria", password: "new", hashed_password: "x", _id: "y", id: "z" });
+  assert.deepEqual(data, { name: "Maria" });
+});
 
 // ----- Création d'une tâche -----
 

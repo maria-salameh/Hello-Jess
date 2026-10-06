@@ -4,12 +4,14 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { api, TOKEN_KEY, type User } from "../api";
 
 // Ce que useAuth() fournit : l'utilisateur courant (null si déconnecté), l'indication que la session
-// sauvegardée est encore en cours de vérification, et les actions pour se connecter, s'inscrire et se déconnecter.
+// sauvegardée est encore en cours de vérification, et les actions pour se connecter, s'inscrire,
+// modifier son profil et se déconnecter.
 type AuthContextValue = {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, name: string, password: string) => Promise<void>;
+  updateProfile: (changes: { name?: string; email?: string }) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -55,6 +57,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.data.user);
   }
 
+  // Modification du profil (nom et/ou email) : le backend renvoie l'utilisateur à jour et un nouveau jeton,
+  // qu'on garde à la place de l'ancien ; le nom et l'email affichés partout se mettent à jour tout de suite.
+  async function updateProfile(changes: { name?: string; email?: string }) {
+    const res = await api.patch("/auth/me", changes);
+    await AsyncStorage.setItem(TOKEN_KEY, res.data.access_token);
+    setUser(res.data.user);
+  }
+
   // Déconnexion : oublie le jeton et l'utilisateur.
   async function logout() {
     await AsyncStorage.removeItem(TOKEN_KEY);
@@ -62,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, updateProfile, logout }}>
       {children}
     </AuthContext.Provider>
   );

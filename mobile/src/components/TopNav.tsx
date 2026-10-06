@@ -31,6 +31,25 @@ export default function TopNav({ subtitle }: { subtitle?: string }) {
         </TouchableOpacity>
       </View>
 
+      {/* L'utilisateur connecté : un avatar rond avec son initiale, puis son nom et son email.
+          Le toucher ouvre l'écran de profil. */}
+      {user && (
+        <TouchableOpacity style={styles.userChip} onPress={() => navigation.navigate("Profile")} accessibilityLabel="Open profile">
+          <View style={styles.userAvatar}>
+            <Text style={styles.userAvatarText}>{user.name.charAt(0).toUpperCase()}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.userName} numberOfLines={1}>
+              {user.name}
+            </Text>
+            <Text style={styles.userEmail} numberOfLines={1}>
+              {user.email}
+            </Text>
+          </View>
+          <Text style={styles.userEmail}>›</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Le menu : l'onglet de l'écran courant est souligné. */}
       <View style={styles.nav}>
         {TABS.map((tab) => {

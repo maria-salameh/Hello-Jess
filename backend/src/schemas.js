@@ -54,6 +54,17 @@ export const loginSchema = z.object({
   password: z.string(),
 });
 
+// Modification du profil : le nom (1 à 100 caractères) et/ou l'email, tous deux facultatifs ; seuls ceux envoyés changent.
+// Les autres champs sont ignorés, donc impossible de changer le mot de passe ou l'id par cette route.
+export const profileUpdateSchema = z.object({
+  name: requiredText("name", 100).optional(),
+  email: z
+    .string({ error: "email must be a string" })
+    .trim()
+    .email("email must be a valid email address")
+    .optional(),
+});
+
 // ----- Tâches -----
 
 // Création d'une tâche : le titre et le statut sont obligatoires ; la priorité vaut "medium" par défaut.

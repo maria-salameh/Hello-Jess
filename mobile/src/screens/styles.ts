@@ -266,6 +266,90 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
+  // ----- L'utilisateur connecté (sous le titre) -----
+
+  // Une ligne : l'avatar rond avec l'initiale, puis le nom et l'email l'un sous l'autre.
+  userChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    padding: 10,
+  },
+  userAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.accent,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  userAvatarText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  userName: {
+    color: colors.text,
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  userEmail: {
+    color: colors.muted,
+    fontSize: 12,
+  },
+
+  // ----- Écran de profil -----
+
+  // L'en-tête de la carte : grand avatar à gauche, nom et email à droite.
+  profileHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    marginBottom: 4,
+  },
+  profileAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: colors.accent,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  profileAvatarText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 26,
+  },
+  // Une ligne d'information : le libellé gris à gauche, la valeur à droite, séparées par un trait.
+  profileRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 16,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  // Le bouton "Cancel" du formulaire de profil : discret, juste une bordure.
+  cancelButton: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    padding: 12,
+    alignItems: "center",
+  },
+  profileValue: {
+    flex: 1,
+    textAlign: "right",
+    color: colors.text,
+    fontWeight: "600",
+    fontSize: 13,
+  },
+
   // ----- Menu de navigation (Tasks / Habits / Statistics) -----
 
   // La rangée du menu sous l'en-tête.

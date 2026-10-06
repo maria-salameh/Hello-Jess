@@ -14,17 +14,18 @@ export function verifyPassword(password, hash) {
   return bcrypt.compare(password, hash);
 }
 
-// Crée un jeton de connexion signé (JWT) qui identifie l'utilisateur par son email et expire au bout d'un moment.
+// Crée un jeton de connexion signé (JWT) qui identifie l'utilisateur par son id et expire au bout d'un moment.
+// L'id ne change jamais, contrairement à l'email : modifier son email ne déconnecte donc personne.
 // Les applications le renvoient à chaque requête dans l'en-tête Authorization.
-export function createAccessToken(email) {
-  return jwt.sign({ sub: email }, config.secretKey, {
+export function createAccessToken(subject) {
+  return jwt.sign({ sub: subject }, config.secretKey, {
     algorithm: "HS256",
     expiresIn: config.tokenExpiresInSeconds,
   });
 }
 
-// Vérifie la signature et l'expiration d'un jeton. Renvoie l'email pour lequel il a été émis,
-// ou null si le jeton est invalide, falsifié ou expiré.
+// Vérifie la signature et l'expiration d'un jeton. Renvoie le sujet pour lequel il a été émis
+// (l'id de l'utilisateur, ou son email pour les anciens jetons), ou null si le jeton est invalide, falsifié ou expiré.
 export function decodeAccessToken(token) {
   try {
     const payload = jwt.verify(token, config.secretKey, { algorithms: ["HS256"] });

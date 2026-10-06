@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from "./src/context/AuthContext";
 import CalendarScreen from "./src/screens/CalendarScreen";
 import HabitsScreen from "./src/screens/HabitsScreen";
 import LoginScreen from "./src/screens/LoginScreen";
+import ProfileScreen from "./src/screens/ProfileScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import StatsScreen from "./src/screens/StatsScreen";
 import TaskDetailScreen from "./src/screens/TaskDetailScreen";
@@ -38,6 +39,7 @@ function RootNavigator() {
           <Stack.Screen name="Calendar" component={CalendarScreen} />
           <Stack.Screen name="Habits" component={HabitsScreen} />
           <Stack.Screen name="Stats" component={StatsScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
         </>
       ) : (
         <>

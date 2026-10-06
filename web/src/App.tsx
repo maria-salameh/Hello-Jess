@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import Calendar from "./pages/Calendar";
 import Habits from "./pages/Habits";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import Stats from "./pages/Stats";
 import TaskDetail from "./pages/TaskDetail";
@@ -42,6 +43,15 @@ function AppRoutes() {
         element={
           <RequireAuth>
             <TaskDetail />
+          </RequireAuth>
+        }
+      />
+      {/* Le profil de l'utilisateur connecté : ses informations et un résumé de son activité. */}
+      <Route
+        path="/profile"
+        element={
+          <RequireAuth>
+            <Profile />
           </RequireAuth>
         }
       />

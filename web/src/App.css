@@ -119,6 +119,66 @@
   color: var(--accent);
 }
 
+/* La partie droite de l'en-tête : l'utilisateur connecté et le bouton de déconnexion, côte à côte. */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* L'utilisateur connecté : un avatar rond avec son initiale, puis son nom et son email l'un sous l'autre.
+   C'est un lien vers la page de profil : pas de soulignement, et un fond léger au survol. */
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+
+.user-chip:hover {
+  background: var(--border);
+}
+
+.user-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.user-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.user-text strong {
+  font-size: 14px;
+}
+
+/* L'email est en petit et gris ; coupé avec "..." s'il est trop long. */
+.user-text span {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Le bouton "Log out" : discret, juste une bordure. */
 .logout-btn {
   background: transparent;
@@ -592,6 +652,122 @@
 .stats-summary span {
   font-size: 12px;
   color: var(--muted);
+}
+
+/* ===== Page de profil ===== */
+
+/* L'en-tête de la carte : grand avatar à gauche, nom et email à droite. */
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.profile-head h2 {
+  margin: 0;
+}
+
+/* Le texte (nom et email) prend la place disponible, pour pousser le bouton "Edit profile" à droite. */
+.profile-head-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Le formulaire de modification : champs empilés, mêmes champs que partout ailleurs. */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.profile-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.profile-form input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+}
+
+/* Le bouton "Save changes" : couleur d'accent, comme les autres boutons principaux. */
+.profile-form button[type="submit"] {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.profile-avatar {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* La liste des informations : un libellé gris à gauche, la valeur à droite, une ligne par information. */
+.profile-list {
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.profile-list dt {
+  color: var(--muted);
+}
+
+.profile-list dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* L'identifiant est une longue suite de caractères : police à chasse fixe et plus petite. */
+.profile-list dd.profile-id {
+  font-family: Consolas, "SF Mono", monospace;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Le bouton "Log out" en bas de la page de profil : contour rouge, comme "Delete task". */
+.danger-outline-btn {
+  width: 100%;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 /* ===== Heatmap ===== */

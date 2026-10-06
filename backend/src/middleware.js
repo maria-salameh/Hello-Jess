@@ -40,8 +40,12 @@ export async function requireAuth(req, res, next) {
   }
 
   // Vérifie le jeton, puis s'assure que l'utilisateur qu'il désigne existe toujours dans la base.
-  const email = decodeAccessToken(token);
-  const user = email ? await User.findOne({ email }) : null;
+  // Les jetons actuels contiennent l'id de l'utilisateur ; les anciens contenaient son email (toujours acceptés).
+  const subject = decodeAccessToken(token);
+  let user = null;
+  if (subject) {
+    user = /^[0-9a-f]{24}$/i.test(subject) ? await User.findById(subject) : await User.findOne({ email: subject });
+  }
   if (!user) {
     return unauthorized(res, "Could not validate credentials");
   }

@@ -20,6 +20,10 @@ It is built as three pieces sharing one backend: a **Node.js/Express API** (Mong
 | --- | --- |
 | ![Habits](docs/habits.png) | ![Statistics](docs/statistics.png) |
 
+| Profile (click the user at the top right) |
+| --- |
+| ![Profile](docs/profile.png) |
+
 ### Mobile app (React Native / Expo)
 
 <table>
@@ -28,12 +32,14 @@ It is built as three pieces sharing one backend: a **Node.js/Express API** (Mong
     <th>Calendar</th>
     <th>Habits</th>
     <th>Statistics</th>
+    <th>Profile</th>
   </tr>
   <tr>
-    <td><img src="docs/mobile-tasks.png" alt="Mobile tasks" width="200"></td>
-    <td><img src="docs/mobile-calendar.png" alt="Mobile calendar" width="200"></td>
-    <td><img src="docs/mobile-habits.png" alt="Mobile habits" width="200"></td>
-    <td><img src="docs/mobile-statistics.png" alt="Mobile statistics" width="200"></td>
+    <td><img src="docs/mobile-tasks.png" alt="Mobile tasks" width="170"></td>
+    <td><img src="docs/mobile-calendar.png" alt="Mobile calendar" width="170"></td>
+    <td><img src="docs/mobile-habits.png" alt="Mobile habits" width="170"></td>
+    <td><img src="docs/mobile-statistics.png" alt="Mobile statistics" width="170"></td>
+    <td><img src="docs/mobile-profile.png" alt="Mobile profile" width="170"></td>
   </tr>
 </table>
 
@@ -55,6 +61,8 @@ It is built as three pieces sharing one backend: a **Node.js/Express API** (Mong
 - Open tasks appear on their due date, or on the day they were added when they have no due date, so a new task always shows up.
 - Tasks are coloured by status: **to do** purple, **doing** orange, **done** green (shown on the day they were completed). **Habits** are blue.
 - A task whose due date has passed keeps its status colour with a **red outline**. Overdue tasks that are due before the visible grid (for example last month) are carried onto today, so they are never hidden.
+
+**Profile** — the logged-in user's name and email are always shown at the top of every screen (web and mobile). Clicking or tapping them opens a **profile page** with the account details (name, email, member since, user ID) and a summary of the account's activity (tasks by status, habits).
 
 ## Structure
 
