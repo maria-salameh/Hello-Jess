@@ -62,7 +62,7 @@ It is built as three pieces sharing one backend: a **Node.js/Express API** (Mong
 - Tasks are coloured by status: **to do** purple, **doing** orange, **done** green (shown on the day they were completed). **Habits** are blue.
 - A task whose due date has passed keeps its status colour with a **red outline**. Overdue tasks that are due before the visible grid (for example last month) are carried onto today, so they are never hidden.
 
-**Profile** — the logged-in user's name and email are always shown at the top of every screen (web and mobile). Clicking or tapping them opens a **profile page** with the account details (name, email, member since, user ID) and a summary of the account's activity (tasks by status, habits).
+**Profile** — the logged-in user's name and email are always shown at the top of every screen (web and mobile). Clicking or tapping them opens a **profile page** with the account details (name, email, member since, user ID) and a summary of the account's activity (tasks by status, habits). From there you can **edit your name and email**: the header updates immediately, an email that is invalid or already used is refused with a clear message, and you keep your tasks and habits.
 
 ## Structure
 
@@ -100,7 +100,7 @@ cd backend
 npm test
 ```
 
-53 tests (Node's built-in test runner, no database needed) cover the date utilities (leap years, weeks, daylight-saving changes), the validation rules of every field, the heatmap, the completion-rate calculations and the calendar events.
+60 tests (Node's built-in test runner, no database needed) cover the date utilities (leap years, weeks, daylight-saving changes), the validation rules of every field (tasks, habits and profile), the login tokens and password hashing, the heatmap, the completion-rate calculations and the calendar events.
 
 ## The `Task` model
 
@@ -123,6 +123,7 @@ All routes except register, login and `/health` need the header `Authorization: 
 | Method and path | What it does |
 | --- | --- |
 | `POST /api/auth/register` · `POST /api/auth/login` · `GET /api/auth/me` | Account (login takes a JSON body `{ email, password }`) |
+| `PATCH /api/auth/me` | Edit your profile: `{ name?, email? }` (only the fields sent change). Returns the updated user and a fresh token; `400` if the email is already used, `422` if a value is invalid |
 | `GET /api/tasks` | Your tasks. Optional filters: `status`, `priority`, `dueFrom`, `dueTo` (inclusive), `noDueDate=true` |
 | `GET /api/tasks/count` | Counter: `{ total, todo, doing, done }` |
 | `POST /api/tasks` · `GET /api/tasks/:id` · `PATCH /api/tasks/:id` · `DELETE /api/tasks/:id` | Create, detail, edit (only the fields sent change), delete |
@@ -176,4 +177,4 @@ For the Android emulator specifically, `http://10.0.2.2:8000` also works instead
 
 ## Accounts / auth
 
-Register creates an account and logs you in immediately (JWT stored in browser localStorage on web, AsyncStorage on mobile). Tasks, habits and statistics are private per-user.
+Register creates an account and logs you in immediately (JWT stored in browser localStorage on web, AsyncStorage on mobile). The token identifies the user by their id, not their email, so changing your email never logs you out of anything. Tasks, habits and statistics are private per-user.
