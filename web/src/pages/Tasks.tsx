@@ -1,11 +1,15 @@
 // La page principale après connexion : afficher, filtrer, ajouter, changer le statut et supprimer ses tâches.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { FormEvent } from "react";
 import { api, errorMessages, type Priority, type Task, type TaskCount, type TaskStatus } from "../api";
 import AppHeader from "../components/AppHeader";
 import ErrorList from "../components/ErrorList";
+import { useLiveRefresh } from "../hooks/useLiveRefresh";
 import TaskItem from "../components/TaskItem";
 import { addDays, todayLocal } from "../utils/dates";
+
+// Events pushed by the server when anyone in the workspace changes a task.
+const TASK_EVENTS = ["task:created", "task:updated", "task:deleted"] as const;
 
 // Les valeurs possibles des trois filtres (bonus B1).
 type StatusFilter = "all" | TaskStatus;
@@ -78,10 +82,9 @@ export default function Tasks() {
     setLoading(false);
   }, [statusFilter, priorityFilter, dueFilter]);
 
-  // Recharge la liste à l'ouverture de la page et à chaque changement de filtre.
-  useEffect(() => {
-    loadTasks();
-  }, [loadTasks]);
+  // Recharge la liste à l'ouverture de la page, à chaque changement de filtre, et quand un autre appareil
+  // ou membre modifie une tâche (WebSocket).
+  useLiveRefresh(TASK_EVENTS, loadTasks);
 
   // Formulaire d'ajout : envoie la nouvelle tâche, puis vide le formulaire et recharge la liste.
   // Les erreurs de validation du backend (titre vide, date impossible...) s'affichent au-dessus du formulaire.

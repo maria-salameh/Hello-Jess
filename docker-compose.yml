@@ -1,0 +1,39 @@
+# Run the whole app locally:  docker compose up --build   (then open http://localhost:8080)
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: hellojess
+      POSTGRES_PASSWORD: hellojess
+      POSTGRES_DB: hellojess
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hellojess"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      PORT: 8000
+      DATABASE_URL: postgres://hellojess:hellojess@db:5432/hellojess
+      SECRET_KEY: ${SECRET_KEY:-dev-only-secret-change-me}
+      CORS_ORIGIN: "*"
+      DB_SYNCHRONIZE: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  web:
+    build: ./web
+    depends_on:
+      - backend
+    ports:
+      - "8080:8080"
+
+volumes:
+  db-data:

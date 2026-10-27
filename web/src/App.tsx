@@ -2,14 +2,18 @@
 import type { ReactNode } from "react";
 import { Navigate, Route, BrowserRouter, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { WorkspaceProvider } from "./context/WorkspaceContext";
 import Calendar from "./pages/Calendar";
 import Habits from "./pages/Habits";
 import Login from "./pages/Login";
+import Notes from "./pages/Notes";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import Stats from "./pages/Stats";
 import TaskDetail from "./pages/TaskDetail";
 import Tasks from "./pages/Tasks";
+import Timers from "./pages/Timers";
+import Workspaces from "./pages/Workspaces";
 // Styles partagés par toutes les pages.
 import "./App.css";
 
@@ -82,6 +86,31 @@ function AppRoutes() {
           </RequireAuth>
         }
       />
+      {/* Shared notes, timers and workspaces. */}
+      <Route
+        path="/notes"
+        element={
+          <RequireAuth>
+            <Notes />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/timers"
+        element={
+          <RequireAuth>
+            <Timers />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/workspaces"
+        element={
+          <RequireAuth>
+            <Workspaces />
+          </RequireAuth>
+        }
+      />
       {/* Toute autre URL ramène à la page d'accueil. */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -89,12 +118,15 @@ function AppRoutes() {
 }
 
 // Haut de l'application : le routeur gère les URLs, le fournisseur d'authentification partage
-// "qui est connecté" avec chaque page, et les pages se trouvent à l'intérieur des deux.
+// "qui est connecté" avec chaque page, le fournisseur d'espaces de travail gère l'espace affiché et la
+// connexion WebSocket, et les pages se trouvent à l'intérieur de tous les trois.
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <WorkspaceProvider>
+          <AppRoutes />
+        </WorkspaceProvider>
       </AuthProvider>
     </BrowserRouter>
   );

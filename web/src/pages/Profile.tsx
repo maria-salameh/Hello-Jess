@@ -1,13 +1,16 @@
 // La page de profil : les informations du compte connecté (modifiables) et un petit résumé de son activité.
 // On y arrive en cliquant sur l'utilisateur affiché en haut à droite.
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { api, errorMessages, type Habit, type TaskCount } from "../api";
 import AppHeader from "../components/AppHeader";
 import ErrorList from "../components/ErrorList";
 import { useAuth } from "../context/AuthContext";
+import { useLiveRefresh } from "../hooks/useLiveRefresh";
 import { formatDate, todayLocal } from "../utils/dates";
+
+const LIVE_EVENTS = ["task:created", "task:updated", "task:deleted", "habit:changed"] as const;
 
 export default function Profile() {
   const { user, logout, updateProfile } = useAuth();
@@ -24,7 +27,7 @@ export default function Profile() {
   const [saved, setSaved] = useState(false);
 
   // Charge le résumé à l'ouverture de la page.
-  useEffect(() => {
+  const loadSummary = useCallback(() => {
     Promise.all([api.get<TaskCount>("/tasks/count"), api.get<Habit[]>("/habits")])
       .then(([tasks, habits]) => {
         setCounts(tasks.data);
@@ -32,6 +35,7 @@ export default function Profile() {
       })
       .catch((err) => setErrors(errorMessages(err)));
   }, []);
+  useLiveRefresh(LIVE_EVENTS, loadSummary);
 
   if (!user) return null;
 

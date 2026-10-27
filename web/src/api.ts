@@ -1,9 +1,14 @@
 // Comment l'application web parle au backend : un client HTTP partagé et la forme des données reçues.
 import axios from "axios";
 
+// Where the backend lives; empty means "same origin" (the web container proxies /api and /socket.io).
+export const API_URL: string = import.meta.env.VITE_API_URL ?? "";
+// Key under which the chosen workspace id is remembered in the browser.
+export const WORKSPACE_KEY = "hellojess_workspace";
+
 // Client préconfiguré : chaque requête part vers <adresse du serveur définie dans web/.env>/api.
 export const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api`,
+  baseURL: `${API_URL}/api`,
   // Abandonne au bout de 10 secondes au lieu d'attendre indéfiniment quand le serveur est injoignable.
   timeout: 10000,
 });
@@ -14,6 +19,11 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem("hellojess_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  // The shared workspace the user is looking at (the backend falls back to their personal one).
+  const workspaceId = localStorage.getItem(WORKSPACE_KEY);
+  if (workspaceId) {
+    config.headers["X-Workspace-Id"] = workspaceId;
   }
   return config;
 });
@@ -48,6 +58,8 @@ export type Priority = "low" | "medium" | "high";
 // completedAt, createdAt et updatedAt sont des instants au format ISO.
 export type Task = {
   id: string;
+  workspaceId: string;
+  createdById: string;
   title: string;
   status: TaskStatus;
   description: string;
@@ -112,3 +124,34 @@ export type CompletionItem = {
   habitCompletions: number;
 };
 export type Completion = { period: "week" | "month"; timeZone: string; today: string; items: CompletionItem[] };
+
+// A member of a workspace.
+export type Member = { id: string; name: string; email: string; role: "owner" | "member" };
+
+// A shared workspace. Everyone's first one is personal and cannot be shared.
+export type Workspace = { id: string; name: string; ownerId: string; isPersonal: boolean; members: Member[] };
+
+// A note shared in a workspace. "version" increases on every save; "updatedById" is who saved it.
+export type Note = {
+  id: string;
+  workspaceId: string;
+  title: string;
+  content: string;
+  updatedById: string;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// A shared countdown timer. A device computes the time left from "remainingMs" and "startedAt"
+// (see utils/timer.ts); "serverTime" lets it correct for a wrong local clock.
+export type SharedTimer = {
+  id: string;
+  workspaceId: string;
+  label: string;
+  durationMs: number;
+  remainingMs: number;
+  status: "idle" | "running" | "paused";
+  startedAt: string | null;
+  serverTime: string;
+};

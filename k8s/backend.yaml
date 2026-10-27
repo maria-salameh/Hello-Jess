@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  # One replica on purpose: WebSocket broadcasts are held in the memory of the process, so with several
+  # replicas a change made on one would not reach clients connected to another. Scaling out needs the
+  # socket.io Redis adapter plus sticky sessions first.
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          # CI replaces the tag with the commit being deployed (see .github/workflows/ci-cd.yml).
+          image: ghcr.io/maria-salameh/hellojess-backend:main
+          ports:
+            - containerPort: 8000
+          env:
+            - name: PORT
+              value: "8000"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hellojess-secrets
+                  key: postgres-password
+            # Kubernetes expands $(POSTGRES_PASSWORD) because it is defined above. Keep the password URL-safe.
+            - name: DATABASE_URL
+              value: postgres://hellojess:$(POSTGRES_PASSWORD)@postgres:5432/hellojess
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hellojess-secrets
+                  key: secret-key
+            - name: CORS_ORIGIN
+              value: "*"
+            # No migrations yet: the tables are created from the entities at start-up.
+            - name: DB_SYNCHRONIZE
+              value: "true"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 6
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 384Mi }

@@ -1,0 +1,141 @@
+name: CI/CD
+
+# Pull requests: run all the tests.
+# Pushes to main: run the tests, build and push the Docker images, deploy to Kubernetes. No manual step.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  backend:
+    name: Backend (Jest)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: hellojess
+          POSTGRES_PASSWORD: hellojess
+          POSTGRES_DB: hellojess_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U hellojess"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Unit tests
+        run: npm test
+      - name: End-to-end tests (real PostgreSQL, real WebSockets)
+        run: npm run test:e2e
+        env:
+          TEST_DATABASE_URL: postgres://hellojess:hellojess@localhost:5432/hellojess_test
+
+  web:
+    name: Web (lint, Vitest, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  images:
+    name: Build and push images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [backend, web]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - name: backend
+            context: backend
+          - name: web
+            context: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Image name (registry paths must be lowercase)
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/hellojess-${{ matrix.name }}" >> "$GITHUB_ENV"
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:main
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+
+  deploy:
+    name: Deploy to Kubernetes
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: images
+    runs-on: ubuntu-latest
+    environment: production
+    # Two deployments must never run at once.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+      - name: Connect to the cluster
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+      - name: Create the secrets once
+        # Never rewritten afterwards: PostgreSQL keeps the password it was first started with.
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          if ! kubectl -n hellojess get secret hellojess-secrets >/dev/null 2>&1; then
+            kubectl -n hellojess create secret generic hellojess-secrets \
+              --from-literal=postgres-password="${{ secrets.POSTGRES_PASSWORD }}" \
+              --from-literal=secret-key="${{ secrets.SECRET_KEY }}"
+          fi
+      - name: Apply manifests and roll out the new images
+        run: |
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          kubectl apply -k k8s
+          kubectl -n hellojess set image deployment/backend backend="ghcr.io/${OWNER}/hellojess-backend:${{ github.sha }}"
+          kubectl -n hellojess set image deployment/web web="ghcr.io/${OWNER}/hellojess-web:${{ github.sha }}"
+          kubectl -n hellojess rollout status statefulset/postgres --timeout=300s
+          kubectl -n hellojess rollout status deployment/backend --timeout=300s
+          kubectl -n hellojess rollout status deployment/web --timeout=300s
+      - name: Roll back if the release did not become healthy
+        if: failure()
+        run: |
+          kubectl -n hellojess rollout undo deployment/backend || true
+          kubectl -n hellojess rollout undo deployment/web || true

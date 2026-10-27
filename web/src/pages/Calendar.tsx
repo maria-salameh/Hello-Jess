@@ -1,11 +1,12 @@
 // La page du calendrier : un mois à la fois, avec les tâches et habitudes marquées en couleur,
 // et la liste détaillée du jour sélectionné en dessous.
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, errorMessages, type CalendarEvent, type CalendarResponse } from "../api";
 import AppHeader from "../components/AppHeader";
 import CalendarView, { describeEvent, eventClass } from "../components/CalendarView";
 import ErrorList from "../components/ErrorList";
+import { useLiveRefresh } from "../hooks/useLiveRefresh";
 import {
   addMonths,
   browserTimeZone,
@@ -17,6 +18,8 @@ import {
   startOfWeek,
   todayLocal,
 } from "../utils/dates";
+
+const LIVE_EVENTS = ["task:created", "task:updated", "task:deleted", "habit:changed"] as const;
 
 export default function Calendar() {
   const today = todayLocal();
@@ -33,7 +36,8 @@ export default function Calendar() {
 
   // Recharge les événements à l'ouverture et à chaque changement de mois.
   // Le fuseau horaire sert au backend à savoir à quel jour appartient une tâche terminée.
-  useEffect(() => {
+  // Aussi à chaque changement poussé en direct (tâches du espace de travail, habitudes de l'utilisateur).
+  const load = useCallback(() => {
     api
       .get<CalendarResponse>("/calendar", { params: { from: gridStart, to: gridEnd, tz } })
       .then((res) => {
@@ -42,6 +46,7 @@ export default function Calendar() {
       })
       .catch((err) => setErrors(errorMessages(err)));
   }, [gridStart, gridEnd, tz]);
+  useLiveRefresh(LIVE_EVENTS, load);
 
   // Passe au mois précédent ou suivant, ou revient à aujourd'hui.
   function goToMonth(newMonth: string) {
