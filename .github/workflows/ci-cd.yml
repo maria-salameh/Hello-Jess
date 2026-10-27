@@ -104,19 +104,29 @@ jobs:
     needs: images
     runs-on: ubuntu-latest
     environment: production
+    env:
+      # Secrets cannot be tested in a step condition directly, so expose whether a cluster is configured.
+      HAS_CLUSTER: ${{ secrets.KUBE_CONFIG != '' }}
     # Two deployments must never run at once.
     concurrency:
       group: deploy-production
       cancel-in-progress: false
     steps:
+      - name: Skip when no cluster is configured
+        if: env.HAS_CLUSTER != 'true'
+        run: echo "::notice::KUBE_CONFIG is not set, so the deploy is skipped. Add the KUBE_CONFIG, POSTGRES_PASSWORD and SECRET_KEY secrets to deploy."
       - uses: actions/checkout@v4
+        if: env.HAS_CLUSTER == 'true'
       - uses: azure/setup-kubectl@v4
+        if: env.HAS_CLUSTER == 'true'
       - name: Connect to the cluster
+        if: env.HAS_CLUSTER == 'true'
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
       - name: Create the secrets once
+        if: env.HAS_CLUSTER == 'true'
         # Never rewritten afterwards: PostgreSQL keeps the password it was first started with.
         run: |
           kubectl apply -f k8s/namespace.yaml
@@ -126,6 +136,7 @@ jobs:
               --from-literal=secret-key="${{ secrets.SECRET_KEY }}"
           fi
       - name: Apply manifests and roll out the new images
+        if: env.HAS_CLUSTER == 'true'
         run: |
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
           kubectl apply -k k8s
@@ -135,7 +146,7 @@ jobs:
           kubectl -n hellojess rollout status deployment/backend --timeout=300s
           kubectl -n hellojess rollout status deployment/web --timeout=300s
       - name: Roll back if the release did not become healthy
-        if: failure()
+        if: env.HAS_CLUSTER == 'true' && failure()
         run: |
           kubectl -n hellojess rollout undo deployment/backend || true
           kubectl -n hellojess rollout undo deployment/web || true
