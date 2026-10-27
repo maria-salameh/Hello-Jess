@@ -43,16 +43,25 @@ export default function Login() {
         {error && <div className="error">{error}</div>}
         <label>
           Email
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </label>
         <label>
           Password
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
         </label>
         <button type="submit" disabled={submitting}>
           {submitting ? "Logging in..." : "Log in"}
         </button>
-        {/* Lien pour ceux qui n'ont pas encore de compte. */}
         <p className="switch">
           No account? <Link to="/register">Sign up</Link>
         </p>

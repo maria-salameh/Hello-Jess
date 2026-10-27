@@ -15,3 +15,5 @@ mobile/.env
 # OS
 .DS_Store
 Thumbs.db
+backend/dist/
+backend/coverage/

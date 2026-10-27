@@ -1,23 +1,48 @@
 {
   "name": "hellojess-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "type": "module",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "dev": "node --watch src/services/server.js",
-    "start": "node src/services/server.js",
-    "test": "node --test"
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+    "test": "jest --selectProjects unit",
+    "test:e2e": "jest --selectProjects e2e --runInBand",
+    "test:all": "jest --runInBand"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "dotenv": "^18.0.5",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.10.4",
-    "zod": "^4.6.5"
+    "@nestjs/common": "^11",
+    "@nestjs/core": "^11",
+    "@nestjs/jwt": "^11",
+    "@nestjs/platform-express": "^11",
+    "@nestjs/platform-socket.io": "^11",
+    "@nestjs/typeorm": "^11",
+    "@nestjs/websockets": "^11",
+    "bcryptjs": "^3",
+    "pg": "^8",
+    "reflect-metadata": "^0.2",
+    "rxjs": "^7",
+    "socket.io": "^4",
+    "typeorm": "^0.3",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11",
+    "@types/express": "^5",
+    "@types/jest": "^30",
+    "@types/jsonwebtoken": "^9",
+    "@types/node": "^22",
+    "@types/supertest": "^7",
+    "embedded-postgres": "18.4.0-beta.17",
+    "jest": "^30",
+    "jsonwebtoken": "^9",
+    "socket.io-client": "^4",
+    "supertest": "^7",
+    "ts-jest": "^29",
+    "ts-node-dev": "^2",
+    "typescript": "~5.9"
   }
 }

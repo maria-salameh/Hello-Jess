@@ -1,10 +1,12 @@
 // L'en-tête commun aux pages connectées : titre, bienvenue, bouton de déconnexion et menu de navigation.
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useWorkspace } from "../context/WorkspaceContext";
 
 // "subtitle" permet à une page d'afficher sa propre phrase sous le titre (sinon : "Hi <nom>").
 export default function AppHeader({ subtitle }: { subtitle?: string }) {
   const { user, logout } = useAuth();
+  const { workspaces, current, switchTo, connected } = useWorkspace();
 
   return (
     <>
@@ -15,6 +17,23 @@ export default function AppHeader({ subtitle }: { subtitle?: string }) {
           <p className="subtitle">{subtitle ?? `Hi ${user?.name}`}</p>
         </div>
         <div className="header-right">
+          {/* The workspace being viewed; everything on the page belongs to it. */}
+          {workspaces.length > 0 && (
+            <select
+              className="workspace-select"
+              value={current?.id ?? ""}
+              onChange={(e) => switchTo(e.target.value)}
+              aria-label="Workspace"
+            >
+              {workspaces.map((workspace) => (
+                <option key={workspace.id} value={workspace.id}>
+                  {workspace.isPersonal ? "Personal" : workspace.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {/* Green when changes from other devices arrive live; grey while reconnecting. */}
+          <span className={`live-dot ${connected ? "on" : ""}`} title={connected ? "Live: changes sync instantly" : "Offline: reconnecting..."} role="status" aria-label={connected ? "Live" : "Offline"} />
           {user && (
             // Un clic sur l'utilisateur ouvre sa page de profil.
             <Link className="user-chip" to="/profile" title={`Logged in as ${user.name} (${user.email}) - view profile`}>
@@ -37,9 +56,12 @@ export default function AppHeader({ subtitle }: { subtitle?: string }) {
         <NavLink to="/" end>
           Tasks
         </NavLink>
+        <NavLink to="/notes">Notes</NavLink>
+        <NavLink to="/timers">Timers</NavLink>
         <NavLink to="/calendar">Calendar</NavLink>
         <NavLink to="/habits">Habits</NavLink>
         <NavLink to="/stats">Statistics</NavLink>
+        <NavLink to="/workspaces">Workspaces</NavLink>
       </nav>
     </>
   );

@@ -1,10 +1,14 @@
 // La page des habitudes (bonus B2) : créer des habitudes récurrentes et cocher, jour par jour, celles qu'on a réalisées.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { FormEvent } from "react";
 import { api, errorMessages, type Habit } from "../api";
 import AppHeader from "../components/AppHeader";
 import ErrorList from "../components/ErrorList";
+import { useLiveRefresh } from "../hooks/useLiveRefresh";
 import { addDays, dayOfMonth, todayLocal, weekdayShort } from "../utils/dates";
+
+// Habits are private: only this user's own devices receive this event.
+const HABIT_EVENTS = ["habit:changed"] as const;
 
 export default function Habits() {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -32,10 +36,8 @@ export default function Habits() {
     setLoading(false);
   }, []);
 
-  // Charge la liste une fois, à l'ouverture de la page.
-  useEffect(() => {
-    loadHabits();
-  }, [loadHabits]);
+  // Charge la liste à l'ouverture de la page, puis à chaque changement fait depuis un autre appareil.
+  useLiveRefresh(HABIT_EVENTS, loadHabits);
 
   // Formulaire d'ajout : crée l'habitude, puis vide le formulaire et recharge la liste.
   async function handleAdd(e: FormEvent) {

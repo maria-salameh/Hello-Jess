@@ -1,11 +1,14 @@
 // La page des statistiques : la heatmap d'activité (bonus B3) et le taux de complétion par période (bonus B4).
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { api, errorMessages, type Completion, type Heatmap as HeatmapData } from "../api";
 import AppHeader from "../components/AppHeader";
 import CompletionChart from "../components/CompletionChart";
 import ErrorList from "../components/ErrorList";
 import Heatmap from "../components/Heatmap";
+import { useLiveRefresh } from "../hooks/useLiveRefresh";
 import { browserTimeZone, formatDate } from "../utils/dates";
+
+const LIVE_EVENTS = ["task:created", "task:updated", "task:deleted", "habit:changed"] as const;
 
 export default function Stats() {
   // Les données de la heatmap et du graphique, et la période choisie pour le graphique.
@@ -19,20 +22,22 @@ export default function Stats() {
   const tz = browserTimeZone();
 
   // La heatmap : chargée une fois (52 dernières semaines).
-  useEffect(() => {
+  const loadHeatmap = useCallback(() => {
     api
       .get<HeatmapData>("/stats/heatmap", { params: { tz } })
       .then((res) => setHeatmap(res.data))
       .catch((err) => setErrors(errorMessages(err)));
   }, [tz]);
+  useLiveRefresh(LIVE_EVENTS, loadHeatmap);
 
   // Le taux de complétion : rechargé quand on passe de la vue par semaine à la vue par mois.
-  useEffect(() => {
+  const loadCompletion = useCallback(() => {
     api
       .get<Completion>("/stats/completion", { params: { period, count: 12, tz } })
       .then((res) => setCompletion(res.data))
       .catch((err) => setErrors(errorMessages(err)));
   }, [period, tz]);
+  useLiveRefresh(LIVE_EVENTS, loadCompletion);
 
   // Quelques chiffres résumés, calculés à partir de la heatmap.
   const days = heatmap?.days ?? [];
