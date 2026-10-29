@@ -121,6 +121,8 @@ Requires Node 22+ and a PostgreSQL server (for example `docker run -p 5432:5432 
 | `SECRET_KEY` | dev placeholder | Secret used to sign login tokens — change it outside local development |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `10080` | Lifetime of a login token |
 | `DB_SYNCHRONIZE` | `true` | Creates and updates the tables from the entities at start-up. There are no migrations yet |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | empty | Mail server for the 6-digit codes sent at sign-up and login. With no `SMTP_HOST` the code is printed in the backend log instead |
+| `MOBILE_TOKEN_EXPIRE_DAYS` | `30` | How long the phone app stays logged in before asking for the password and a new code |
 
 ### Tests
 

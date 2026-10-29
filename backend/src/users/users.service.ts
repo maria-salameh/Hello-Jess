@@ -19,7 +19,7 @@ export class UsersService {
     return ids.length ? this.users.findBy({ id: In(ids) }) : Promise.resolve([]);
   }
 
-  create(data: { email: string; name: string; hashedPassword: string }) {
+  create(data: { email: string; name: string; hashedPassword: string; emailVerified: boolean }) {
     return this.users.save(this.users.create(data));
   }
 

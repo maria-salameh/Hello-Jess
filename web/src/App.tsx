@@ -1,6 +1,7 @@
 // Décide quelle page afficher pour quelle URL, et empêche les visiteurs non connectés d'accéder à la liste des tâches.
 import type { ReactNode } from "react";
 import { Navigate, Route, BrowserRouter, Routes } from "react-router-dom";
+import EggTimer from "./components/EggTimer";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { WorkspaceProvider } from "./context/WorkspaceContext";
 import Calendar from "./pages/Calendar";
@@ -12,7 +13,6 @@ import Register from "./pages/Register";
 import Stats from "./pages/Stats";
 import TaskDetail from "./pages/TaskDetail";
 import Tasks from "./pages/Tasks";
-import Timers from "./pages/Timers";
 import Workspaces from "./pages/Workspaces";
 // Styles partagés par toutes les pages.
 import "./App.css";
@@ -86,20 +86,12 @@ function AppRoutes() {
           </RequireAuth>
         }
       />
-      {/* Shared notes, timers and workspaces. */}
+      {/* Shared notes and workspaces. */}
       <Route
         path="/notes"
         element={
           <RequireAuth>
             <Notes />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/timers"
-        element={
-          <RequireAuth>
-            <Timers />
           </RequireAuth>
         }
       />
@@ -126,6 +118,8 @@ export default function App() {
       <AuthProvider>
         <WorkspaceProvider>
           <AppRoutes />
+          {/* Le minuteur d'œuf flotte en bas à droite sur toutes les pages. */}
+          <EggTimer />
         </WorkspaceProvider>
       </AuthProvider>
     </BrowserRouter>

@@ -5,11 +5,16 @@ import { io, type Socket } from 'socket.io-client';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/app.setup';
+import { MailService } from '../src/mail/mail.service';
 
 let app: INestApplication;
 let http: ReturnType<INestApplication['getHttpServer']>;
 let url: string;
 const sockets: Socket[] = [];
+
+// Emails are not sent in the tests: the last one for each address is kept so a test can read its code.
+const mailbox = new Map<string, string>();
+const lastCode = (email: string) => mailbox.get(email)!.match(/\b\d{6}\b/)![0];
 
 type Account = { token: string; id: string; email: string };
 const auth = (a: Account) => ({ Authorization: `Bearer ${a.token}` });
@@ -17,7 +22,8 @@ const unique = () => Math.random().toString(36).slice(2, 10);
 
 async function register(name = 'Ada'): Promise<Account> {
   const email = `${name.toLowerCase()}-${unique()}@example.com`;
-  const res = await request(http).post('/api/auth/register').send({ email, name, password: 'pw-123456' }).expect(201);
+  await request(http).post('/api/auth/register').send({ email, name, password: 'pw-123456' }).expect(201);
+  const res = await request(http).post('/api/auth/verify').send({ email, code: lastCode(email) }).expect(200);
   return { token: res.body.access_token, id: res.body.user.id, email };
 }
 
@@ -53,7 +59,10 @@ const silentFor = (socket: Socket, event: string, ms = 400) =>
   });
 
 beforeAll(async () => {
-  const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+  const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+    .overrideProvider(MailService)
+    .useValue({ send: async (to: string, _subject: string, text: string) => void mailbox.set(to, text) })
+    .compile();
   app = moduleRef.createNestApplication();
   configureApp(app);
   await app.listen(0);
@@ -83,13 +92,26 @@ describe('health and errors', () => {
 describe('accounts', () => {
   it('registers, logs in, reads and edits the profile', async () => {
     const email = `maria-${unique()}@example.com`;
+    // Sign-up does not log in: it emails a code, and the code gives the token.
     const reg = await request(http).post('/api/auth/register').send({ email, name: 'Maria', password: 'secret-pw' }).expect(201);
-    expect(reg.body.user).toMatchObject({ email, name: 'Maria' });
-    expect(reg.body.user.hashedPassword).toBeUndefined();
+    expect(reg.body).toEqual({ verification_required: true, purpose: 'verify', email });
+    expect(reg.body.access_token).toBeUndefined();
 
     await request(http).post('/api/auth/register').send({ email, name: 'Dup', password: 'x' }).expect(400, { detail: 'Email already registered' });
+    await request(http).post('/api/auth/verify').send({ email, code: '000000' }).expect(400, { detail: 'Incorrect code' });
+    const verified = await request(http).post('/api/auth/verify').send({ email, code: lastCode(email) }).expect(200);
+    expect(verified.body.user).toMatchObject({ email, name: 'Maria' });
+    expect(verified.body.user.hashedPassword).toBeUndefined();
+    // A code works once.
+    await request(http).post('/api/auth/verify').send({ email, code: lastCode(email) }).expect(400);
+
+    // Login: the password only leads to a second code; the code gives the token.
     await request(http).post('/api/auth/login').send({ email, password: 'wrong' }).expect(401);
-    const login = await request(http).post('/api/auth/login').send({ email, password: 'secret-pw' }).expect(200);
+    const step1 = await request(http).post('/api/auth/login').send({ email, password: 'secret-pw' }).expect(200);
+    expect(step1.body).toEqual({ verification_required: true, purpose: 'login', email });
+    expect(step1.body.access_token).toBeUndefined();
+    await request(http).post('/api/auth/resend').send({ email }).expect(429);
+    const login = await request(http).post('/api/auth/verify').send({ email, code: lastCode(email) }).expect(200);
 
     const headers = { Authorization: `Bearer ${login.body.access_token}` };
     await request(http).get('/api/auth/me').set(headers).expect(200).expect((r) => expect(r.body.email).toBe(email));
@@ -97,6 +119,20 @@ describe('accounts', () => {
     const patched = await request(http).patch('/api/auth/me').set(headers).send({ name: 'Maria S.' }).expect(200);
     expect(patched.body.user.name).toBe('Maria S.');
     await request(http).patch('/api/auth/me').set(headers).send({ email: 'nope' }).expect(422);
+  });
+
+  it('locks a code after 5 wrong guesses and gives the phone app a longer token', async () => {
+    const email = `lock-${unique()}@example.com`;
+    await request(http).post('/api/auth/register').send({ email, name: 'Lock', password: 'secret-pw', client: 'mobile' }).expect(201);
+    const code = lastCode(email);
+    const wrong = code === '123456' ? '654321' : '123456';
+    for (let i = 0; i < 5; i++) await request(http).post('/api/auth/verify').send({ email, code: wrong }).expect(400, { detail: 'Incorrect code' });
+    await request(http).post('/api/auth/verify').send({ email, code }).expect(400, { detail: 'Too many wrong codes. Request a new one.' });
+
+    // Nothing to resend for an address that never started a login.
+    await request(http).post('/api/auth/resend').send({ email: `nobody-${unique()}@example.com` }).expect(400);
+    // A malformed code is refused before anything is checked.
+    await request(http).post('/api/auth/verify').send({ email, code: 'abc' }).expect(422);
   });
 
   it('rejects requests without a valid token', async () => {

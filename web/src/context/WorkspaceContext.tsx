@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { Socket } from "socket.io-client";
 import { WORKSPACE_KEY, api, type Workspace } from "../api";
 import { createSocket } from "../realtime";
+import { getToken } from "../utils/session";
 import { useAuth } from "./AuthContext";
 
 type WorkspaceContextValue = {
@@ -56,7 +57,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     }
     refresh().catch(() => undefined);
 
-    const token = localStorage.getItem("hellojess_token") ?? "";
+    const token = getToken() ?? "";
     const live = createSocket(token);
     let hasConnected = false;
     live.on("connect", () => {

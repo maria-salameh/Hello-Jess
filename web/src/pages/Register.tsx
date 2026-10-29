@@ -1,8 +1,9 @@
-// La page d'inscription : crée un compte et va directement à la liste des tâches.
+// La page d'inscription, en deux étapes : le formulaire, puis le code reçu par email qui confirme l'adresse. Ensuite la liste des tâches s'ouvre.
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { errorMessages } from "../api";
+import { errorMessages, type Challenge } from "../api";
+import CodeForm from "../components/CodeForm";
 import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
@@ -12,10 +13,13 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [stay, setStay] = useState(true);
   // Message affiché au-dessus du formulaire quand l'inscription échoue.
   const [error, setError] = useState<string | null>(null);
   // Vaut true pendant l'envoi de la requête, pour désactiver le bouton et éviter les doubles envois.
   const [submitting, setSubmitting] = useState(false);
+  // Une fois le compte créé, le backend envoie un code par email : on passe à la deuxième étape.
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
 
   // S'exécute quand le formulaire est envoyé.
   async function handleSubmit(e: FormEvent) {
@@ -24,15 +28,21 @@ export default function Register() {
     setError(null);
     setSubmitting(true);
     try {
-      await register(email, name, password);
-      // Succès : l'utilisateur est déjà connecté, donc on va à la liste des tâches.
-      navigate("/");
+      setChallenge(await register(email, name, password));
     } catch (err) {
       // Affiche la vraie raison renvoyée par le backend (ex. "Email already registered") ou "serveur injoignable".
       setError(errorMessages(err).join(" "));
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (challenge) {
+    return (
+      <div className="auth-page">
+        <CodeForm challenge={challenge} stay={stay} onDone={() => navigate("/")} onBack={() => setChallenge(null)} />
+      </div>
+    );
   }
 
   return (
@@ -60,8 +70,12 @@ export default function Register() {
             minLength={8}
           />
         </label>
+        <label className="stay-row">
+          <input type="checkbox" checked={stay} onChange={(e) => setStay(e.target.checked)} />
+          Stay logged in while the browser is open
+        </label>
         <button type="submit" disabled={submitting}>
-          {submitting ? "Creating..." : "Sign up"}
+          {submitting ? "Sending code..." : "Sign up"}
         </button>
         {/* Lien pour ceux qui ont déjà un compte. */}
         <p className="switch">

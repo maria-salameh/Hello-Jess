@@ -12,6 +12,10 @@ export class User extends IdEntity {
   @Column({ name: 'hashed_password' })
   hashedPassword: string;
 
+  // False until the user has typed the code emailed at sign-up. Accounts created before this existed count as verified.
+  @Column({ name: 'email_verified', default: true })
+  emailVerified: boolean;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 }
