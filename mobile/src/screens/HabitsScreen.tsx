@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { api, errorMessages, type Habit } from "../api";
 import ErrorList from "../components/ErrorList";
+import { FadeInCell } from "../components/FadeIn";
 import TopNav from "../components/TopNav";
+import { useLiveReload } from "../hooks/useLiveReload";
 import { confirmAction } from "../utils/confirm";
 import { addDays, dayOfMonth, todayLocal, weekdayShort } from "../utils/dates";
 import { styles } from "./styles";
@@ -41,6 +43,7 @@ export default function HabitsScreen() {
     loadHabits();
   }, [loadHabits]);
   useEffect(() => navigation.addListener("focus", loadHabits), [navigation, loadHabits]);
+  useLiveReload(["habit:changed"], loadHabits);
 
   // Formulaire d'ajout : crée l'habitude, puis vide le formulaire et recharge la liste.
   async function handleAdd() {
@@ -118,6 +121,7 @@ export default function HabitsScreen() {
   return (
     <View style={styles.tasksPage}>
       <FlatList
+        CellRendererComponent={FadeInCell}
         data={loading ? [] : habits}
         keyExtractor={(h) => h.id}
         keyboardShouldPersistTaps="handled"

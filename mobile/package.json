@@ -8,6 +8,7 @@
     "@react-navigation/native-stack": "^7.18.10",
     "axios": "^1.20.0",
     "expo": "~57.0.20",
+    "expo-linear-gradient": "~57.0.2",
     "expo-local-authentication": "~57.0.3",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
@@ -16,7 +17,8 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "react-native-svg": "15.15.4",
-    "react-native-web": "^0.21.2"
+    "react-native-web": "^0.21.2",
+    "socket.io-client": "^4.8.4"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",

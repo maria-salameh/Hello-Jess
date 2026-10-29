@@ -1,12 +1,13 @@
 // L'écran du calendrier : un mois à la fois, avec les tâches et habitudes marquées par des points de couleur,
 // et la liste détaillée du jour touché en dessous.
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { api, errorMessages, type CalendarEvent, type CalendarResponse } from "../api";
 import Chip from "../components/Chip";
 import ErrorList from "../components/ErrorList";
 import TopNav from "../components/TopNav";
+import { useLiveReload } from "../hooks/useLiveReload";
 import { EVENT_COLORS, describeEvent, eventColor, isOverdue } from "../utils/calendar";
 import {
   addDays,
@@ -29,6 +30,8 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 // Combien de points de couleur on montre dans une case.
 const MAX_DOTS = 6;
 
+const LIVE_EVENTS = ["task:created", "task:updated", "task:deleted", "habit:changed"] as const;
+
 export default function CalendarScreen() {
   const navigation = useNavigation<any>();
   const today = todayLocal();
@@ -45,18 +48,22 @@ export default function CalendarScreen() {
 
   // Recharge les événements à l'ouverture, à chaque changement de mois et à chaque retour sur l'écran.
   // Le fuseau horaire sert au backend à savoir à quel jour appartient une tâche terminée.
-  useEffect(() => {
-    const load = () =>
+  const load = useCallback(
+    () =>
       api
         .get<CalendarResponse>("/calendar", { params: { from: gridStart, to: gridEnd, tz } })
         .then((res) => {
           setEvents(res.data.events);
           setErrors([]);
         })
-        .catch((err) => setErrors(errorMessages(err)));
+        .catch((err) => setErrors(errorMessages(err))),
+    [gridStart, gridEnd, tz],
+  );
+  useEffect(() => {
     load();
     return navigation.addListener("focus", load);
-  }, [navigation, gridStart, gridEnd, tz]);
+  }, [navigation, load]);
+  useLiveReload(LIVE_EVENTS, load);
 
   // Passe au mois précédent ou suivant, ou revient à aujourd'hui.
   function goToMonth(newMonth: string) {

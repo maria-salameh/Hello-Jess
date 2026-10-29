@@ -3,13 +3,13 @@
 // donc on utilise window.confirm.
 import { Alert, Platform } from "react-native";
 
-export function confirmAction(message: string, onConfirm: () => void) {
+export function confirmAction(message: string, onConfirm: () => void, confirmLabel = "Delete") {
   if (Platform.OS === "web") {
     if (window.confirm(message)) onConfirm();
     return;
   }
   Alert.alert("Are you sure?", message, [
     { text: "Cancel", style: "cancel" },
-    { text: "Delete", style: "destructive", onPress: onConfirm },
+    { text: confirmLabel, style: "destructive", onPress: onConfirm },
   ]);
 }

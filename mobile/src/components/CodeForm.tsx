@@ -1,9 +1,11 @@
 // La deuxième étape de l'inscription et de la connexion : le code à six chiffres reçu par email.
 // Sur un téléphone avec Face ID, Face ID est demandé juste après un bon code (voir AuthContext.verifyCode).
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { errorMessages, type Challenge } from "../api";
 import { useAuth } from "../context/AuthContext";
+import Button from "./Button";
+import FadeIn from "./FadeIn";
 import { styles } from "../screens/styles";
 
 type Props = { challenge: Challenge; onBack: () => void };
@@ -51,7 +53,7 @@ export default function CodeForm({ challenge, onBack }: Props) {
   }
 
   return (
-    <View style={styles.authCard}>
+    <FadeIn style={styles.authCard}>
       <Text style={styles.title}>HelloJess</Text>
       <Text style={styles.subtitle}>{challenge.purpose === "verify" ? "Verify your email" : "Two-step verification"}</Text>
       <Text style={styles.hint}>
@@ -71,17 +73,12 @@ export default function CodeForm({ challenge, onBack }: Props) {
         maxLength={6}
         autoFocus
       />
-      <TouchableOpacity
-        style={[styles.button, (submitting || code.length !== 6) && styles.buttonDisabled]}
+      <Button
+        label={challenge.purpose === "verify" ? "Verify and continue" : "Log in"}
         onPress={handleSubmit}
-        disabled={submitting || code.length !== 6}
-      >
-        {submitting ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>{challenge.purpose === "verify" ? "Verify and continue" : "Log in"}</Text>
-        )}
-      </TouchableOpacity>
+        loading={submitting}
+        disabled={code.length !== 6}
+      />
       <View style={styles.codeLinks}>
         <TouchableOpacity onPress={handleResend} disabled={wait > 0}>
           <Text style={[styles.linkText, wait > 0 && styles.linkTextDisabled]}>
@@ -92,6 +89,6 @@ export default function CodeForm({ challenge, onBack }: Props) {
           <Text style={styles.linkText}>Back</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </FadeIn>
   );
 }
