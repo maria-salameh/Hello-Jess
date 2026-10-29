@@ -1,13 +1,17 @@
 // L'écran de profil : les informations du compte connecté (modifiables) et un petit résumé de son activité.
 // On y arrive en touchant l'utilisateur affiché sous le titre.
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { api, errorMessages, type Habit, type TaskCount } from "../api";
+import Button from "../components/Button";
 import ErrorList from "../components/ErrorList";
+import { useLiveReload } from "../hooks/useLiveReload";
 import { useAuth } from "../context/AuthContext";
 import { formatDate, todayLocal } from "../utils/dates";
 import { styles } from "./styles";
+
+const LIVE_EVENTS = ["task:created", "task:updated", "task:deleted", "habit:changed"] as const;
 
 export default function ProfileScreen() {
   const navigation = useNavigation<any>();
@@ -25,7 +29,7 @@ export default function ProfileScreen() {
   const [saved, setSaved] = useState(false);
 
   // Charge le résumé à l'ouverture de l'écran.
-  useEffect(() => {
+  const loadSummary = useCallback(() => {
     Promise.all([api.get<TaskCount>("/tasks/count"), api.get<Habit[]>("/habits")])
       .then(([tasks, habits]) => {
         setCounts(tasks.data);
@@ -33,6 +37,10 @@ export default function ProfileScreen() {
       })
       .catch((err) => setErrors(errorMessages(err)));
   }, []);
+  useEffect(() => {
+    loadSummary();
+  }, [loadSummary]);
+  useLiveReload(LIVE_EVENTS, loadSummary);
 
   if (!user) return null;
 
@@ -110,9 +118,7 @@ export default function ProfileScreen() {
               autoCapitalize="none"
               keyboardType="email-address"
             />
-            <TouchableOpacity style={styles.button} onPress={handleSave} disabled={saving}>
-              <Text style={styles.buttonText}>{saving ? "Saving..." : "Save changes"}</Text>
-            </TouchableOpacity>
+            <Button label="Save changes" onPress={handleSave} loading={saving} />
             <TouchableOpacity style={styles.cancelButton} onPress={() => setEditing(false)} disabled={saving}>
               <Text style={styles.logoutText}>Cancel</Text>
             </TouchableOpacity>

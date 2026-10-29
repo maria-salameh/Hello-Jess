@@ -5,15 +5,18 @@ import { ActivityIndicator, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import EggTimer from "./src/components/EggTimer";
 import { AuthProvider, useAuth } from "./src/context/AuthContext";
+import { WorkspaceProvider } from "./src/context/WorkspaceContext";
 import CalendarScreen from "./src/screens/CalendarScreen";
 import HabitsScreen from "./src/screens/HabitsScreen";
 import LockScreen from "./src/screens/LockScreen";
 import LoginScreen from "./src/screens/LoginScreen";
+import NotesScreen from "./src/screens/NotesScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import StatsScreen from "./src/screens/StatsScreen";
 import TaskDetailScreen from "./src/screens/TaskDetailScreen";
 import TasksScreen from "./src/screens/TasksScreen";
+import WorkspacesScreen from "./src/screens/WorkspacesScreen";
 
 // La "pile" d'écrans : naviguer ouvre un écran par-dessus l'autre.
 const Stack = createNativeStackNavigator();
@@ -44,9 +47,11 @@ function RootNavigator() {
         <>
           <Stack.Screen name="Tasks" component={TasksScreen} />
           <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
+          <Stack.Screen name="Notes" component={NotesScreen} />
           <Stack.Screen name="Calendar" component={CalendarScreen} />
           <Stack.Screen name="Habits" component={HabitsScreen} />
           <Stack.Screen name="Stats" component={StatsScreen} />
+          <Stack.Screen name="Workspaces" component={WorkspacesScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
         </>
       ) : (
@@ -68,9 +73,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <NavigationContainer theme={DarkTheme}>
-          <RootNavigator />
-        </NavigationContainer>
+        <WorkspaceProvider>
+          <NavigationContainer theme={DarkTheme}>
+            <RootNavigator />
+          </NavigationContainer>
+        </WorkspaceProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );

@@ -1,6 +1,6 @@
 // L'écran des statistiques : la heatmap d'activité (bonus B3) et le taux de complétion par période (bonus B4).
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { api, errorMessages, type Completion, type Heatmap as HeatmapData, type HeatmapDay } from "../api";
 import Chip from "../components/Chip";
@@ -8,8 +8,11 @@ import CompletionChart from "../components/CompletionChart";
 import ErrorList from "../components/ErrorList";
 import Heatmap from "../components/Heatmap";
 import TopNav from "../components/TopNav";
+import { useLiveReload } from "../hooks/useLiveReload";
 import { deviceTimeZone, formatDate } from "../utils/dates";
 import { styles } from "./styles";
+
+const LIVE_EVENTS = ["task:created", "task:updated", "task:deleted", "habit:changed"] as const;
 
 export default function StatsScreen() {
   const navigation = useNavigation<any>();
@@ -25,23 +28,33 @@ export default function StatsScreen() {
   const tz = deviceTimeZone();
 
   // La heatmap : chargée à l'ouverture et à chaque retour sur l'écran (52 dernières semaines).
-  useEffect(() => {
-    const load = () =>
+  const loadHeatmap = useCallback(
+    () =>
       api
         .get<HeatmapData>("/stats/heatmap", { params: { tz } })
         .then((res) => setHeatmap(res.data))
-        .catch((err) => setErrors(errorMessages(err)));
-    load();
-    return navigation.addListener("focus", load);
-  }, [navigation, tz]);
+        .catch((err) => setErrors(errorMessages(err))),
+    [tz],
+  );
+  useEffect(() => {
+    loadHeatmap();
+    return navigation.addListener("focus", loadHeatmap);
+  }, [navigation, loadHeatmap]);
+  useLiveReload(LIVE_EVENTS, loadHeatmap);
 
   // Le taux de complétion : rechargé quand on passe de la vue par semaine à la vue par mois.
+  const loadCompletion = useCallback(
+    () =>
+      api
+        .get<Completion>("/stats/completion", { params: { period, count: 12, tz } })
+        .then((res) => setCompletion(res.data))
+        .catch((err) => setErrors(errorMessages(err))),
+    [period, tz],
+  );
   useEffect(() => {
-    api
-      .get<Completion>("/stats/completion", { params: { period, count: 12, tz } })
-      .then((res) => setCompletion(res.data))
-      .catch((err) => setErrors(errorMessages(err)));
-  }, [period, tz]);
+    loadCompletion();
+  }, [loadCompletion]);
+  useLiveReload(LIVE_EVENTS, loadCompletion);
 
   // Quelques chiffres résumés, calculés à partir de la heatmap.
   const days = heatmap?.days ?? [];

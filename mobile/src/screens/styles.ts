@@ -3,7 +3,7 @@
 import { Platform, StyleSheet } from "react-native";
 
 // La palette de couleurs (thème sombre), définie une seule fois et réutilisée partout.
-const colors = {
+export const colors = {
   bg: "#12111a",
   card: "#1c1a27",
   text: "#f2f0ff",
@@ -405,12 +405,13 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.card,
+    overflow: "hidden",
   },
   // Un onglet du menu, et son aspect quand c'est la page courante (souligné en couleur d'accent).
   navItem: {
-    flex: 1,
     alignItems: "center",
     paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 999,
   },
   navItemActive: {
@@ -722,6 +723,89 @@ export const styles = StyleSheet.create({
     paddingTop: Platform.OS === "ios" ? 60 : 40,
     paddingBottom: 60,
     gap: 12,
+  },
+
+  // ----- Espaces de travail, notes et indicateur "en direct" -----
+
+  // La pastille sous le titre : un point vert quand la connexion en direct fonctionne, puis le nom de l'espace de travail.
+  workspaceChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    alignSelf: "flex-start",
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  workspaceChipText: {
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  liveDot: {
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: colors.muted,
+  },
+  liveDotOn: {
+    backgroundColor: "#22a06b",
+    shadowColor: "#22a06b",
+    shadowOpacity: 0.9,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  // Une note dans la liste, et la ligne titre + bouton supprimer de l'éditeur.
+  noteCard: {
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+    gap: 2,
+    ...shadow(0.2, 8, 3),
+  },
+  noteTitle: {
+    color: colors.text,
+    fontWeight: "700",
+    fontSize: 15,
+  },
+  noteHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  noteTextInput: {
+    minHeight: 320,
+    textAlignVertical: "top",
+    lineHeight: 22,
+  },
+  badgeRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 6,
+  },
+  memberRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+    paddingVertical: 4,
+  },
+  // Le bouton principal en dégradé (voir components/Button.tsx).
+  gradientButton: {
+    borderRadius: 12,
+    overflow: "hidden",
+    marginTop: 8,
+    ...shadow(0.4, 12, 6),
+  },
+  gradientFill: {
+    padding: 14,
+    alignItems: "center",
   },
 
   // ----- Calendrier -----

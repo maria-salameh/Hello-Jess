@@ -4,6 +4,8 @@ import axios from "axios";
 
 // Nom sous lequel le jeton de connexion est sauvegardé dans le stockage du téléphone.
 export const TOKEN_KEY = "hellojess_token";
+// Nom sous lequel l'espace de travail choisi est sauvegardé.
+export const WORKSPACE_KEY = "hellojess_workspace";
 
 // Client préconfiguré : chaque requête part vers <adresse du serveur définie dans mobile/.env>/api.
 // Sur un téléphone, cette adresse doit être celle de l'ordinateur sur le réseau, pas "localhost".
@@ -20,6 +22,11 @@ api.interceptors.request.use(async (config) => {
   const token = await AsyncStorage.getItem(TOKEN_KEY);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  // L'espace de travail (partagé ou personnel) que l'utilisateur regarde ; sans lui, le backend prend le personnel.
+  const workspaceId = await AsyncStorage.getItem(WORKSPACE_KEY);
+  if (workspaceId) {
+    config.headers["X-Workspace-Id"] = workspaceId;
   }
   return config;
 });
@@ -61,6 +68,22 @@ export type User = {
   email: string;
   name: string;
   created_at: string;
+};
+
+// Un membre d'un espace de travail, et l'espace de travail lui-même. Le premier de chaque utilisateur est personnel.
+export type Member = { id: string; name: string; email: string; role: "owner" | "member" };
+export type Workspace = { id: string; name: string; ownerId: string; isPersonal: boolean; members: Member[] };
+
+// Une note partagée : tous les membres de l'espace de travail voient les modifications en direct.
+export type Note = {
+  id: string;
+  workspaceId: string;
+  title: string;
+  content: string;
+  updatedById: string;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 // Les valeurs possibles pour l'avancement et la priorité d'une tâche.

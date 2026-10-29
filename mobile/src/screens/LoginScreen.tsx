@@ -1,15 +1,15 @@
 // L'écran de connexion : un formulaire email/mot de passe. Après la connexion, l'application bascule d'elle-même sur la liste des tâches.
 import { useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
 } from "react-native";
 import { errorMessages, type Challenge } from "../api";
+import Button from "../components/Button";
+import FadeIn from "../components/FadeIn";
 import CodeForm from "../components/CodeForm";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "./styles";
@@ -55,7 +55,7 @@ export default function LoginScreen({ navigation }: any) {
       style={styles.authPage}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={styles.authCard}>
+      <FadeIn style={styles.authCard}>
         <Text style={styles.title}>HelloJess</Text>
         <Text style={styles.subtitle}>Log in to your tasks</Text>
         {/* Affiché seulement quand il y a un message d'erreur. */}
@@ -72,14 +72,12 @@ export default function LoginScreen({ navigation }: any) {
         {/* secureTextEntry masque les caractères saisis. */}
         <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry />
         {/* Le bouton affiche un indicateur de chargement pendant l'envoi. */}
-        <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={submitting}>
-          {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Log in</Text>}
-        </TouchableOpacity>
+        <Button label="Log in" onPress={handleSubmit} loading={submitting} />
         {/* Lien vers l'écran d'inscription pour ceux qui n'ont pas encore de compte. */}
         <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={styles.switchText}>No account? Sign up</Text>
         </TouchableOpacity>
-      </View>
+      </FadeIn>
     </KeyboardAvoidingView>
   );
 }

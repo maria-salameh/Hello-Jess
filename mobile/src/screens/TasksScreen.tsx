@@ -5,7 +5,9 @@ import { FlatList, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { api, errorMessages, type Priority, type Task, type TaskCount, type TaskStatus } from "../api";
 import Chip from "../components/Chip";
 import ErrorList from "../components/ErrorList";
+import { FadeInCell } from "../components/FadeIn";
 import TopNav from "../components/TopNav";
+import { useLiveReload } from "../hooks/useLiveReload";
 import { addDays, formatDate, todayLocal } from "../utils/dates";
 import { styles } from "./styles";
 
@@ -67,6 +69,8 @@ function buildParams(status: StatusFilter, priority: PriorityFilter, due: DueFil
   return params;
 }
 
+const TASK_EVENTS = ["task:created", "task:updated", "task:deleted"] as const;
+
 export default function TasksScreen() {
   const navigation = useNavigation<any>();
   // La liste affichée et le compteur de tâches par statut.
@@ -112,6 +116,8 @@ export default function TasksScreen() {
 
   // Quand on revient d'un autre écran (ex. la page de détail après une modification), on recharge la liste.
   useEffect(() => navigation.addListener("focus", loadTasks), [navigation, loadTasks]);
+  // Et à chaque changement venu d'un autre appareil ou d'un autre membre de l'espace de travail.
+  useLiveReload(TASK_EVENTS, loadTasks);
 
   // Formulaire d'ajout : envoie la nouvelle tâche, puis vide le formulaire et recharge la liste.
   // Les erreurs de validation du backend (titre vide, date impossible...) s'affichent au-dessus du formulaire.
@@ -235,6 +241,7 @@ export default function TasksScreen() {
         </>
       ) : (
         <FlatList
+          CellRendererComponent={FadeInCell}
           data={tasks}
           keyExtractor={(t) => t.id}
           keyboardShouldPersistTaps="handled"
