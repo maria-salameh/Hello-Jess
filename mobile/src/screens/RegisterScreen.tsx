@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { errorMessages } from "../api";
+import { errorMessages, type Challenge } from "../api";
+import CodeForm from "../components/CodeForm";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "./styles";
 
@@ -21,6 +22,8 @@ export default function RegisterScreen({ navigation }: any) {
   const [password, setPassword] = useState("");
   // Message affiché au-dessus du formulaire quand l'inscription échoue.
   const [error, setError] = useState<string | null>(null);
+  // Le code envoyé par email, une fois la première étape réussie.
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
   // Vaut true pendant l'envoi de la requête, pour désactiver le bouton et éviter les doubles envois.
   const [submitting, setSubmitting] = useState(false);
 
@@ -29,13 +32,22 @@ export default function RegisterScreen({ navigation }: any) {
     setError(null);
     setSubmitting(true);
     try {
-      await register(email, name, password);
+      setChallenge(await register(email, name, password));
     } catch (err) {
       // Affiche la vraie raison renvoyée par le backend (ex. "Email already registered") ou "serveur injoignable".
       setError(errorMessages(err).join(" "));
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // Une fois le mot de passe accepté, le backend envoie un code par email : deuxième étape.
+  if (challenge) {
+    return (
+      <KeyboardAvoidingView style={styles.authPage} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <CodeForm challenge={challenge} onBack={() => setChallenge(null)} />
+      </KeyboardAvoidingView>
+    );
   }
 
   return (

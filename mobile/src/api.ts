@@ -27,6 +27,8 @@ api.interceptors.request.use(async (config) => {
 // Transforme une erreur de requête en liste de messages lisibles : les messages de validation du
 // backend (un par champ en erreur), son message général, ou un message adapté si le serveur est injoignable.
 export function errorMessages(err: unknown): string[] {
+  // Face ID refused or cancelled (see AuthContext): its message is already readable.
+  if (err instanceof BiometricError) return [err.message];
   if (axios.isAxiosError(err)) {
     const data = err.response?.data;
     if (Array.isArray(data?.errors) && data.errors.length > 0) {
@@ -42,6 +44,16 @@ export function errorMessages(err: unknown): string[] {
   }
   return ["Something went wrong. Please try again."];
 }
+
+// Lancée quand la vérification par Face ID échoue ou est annulée pendant la connexion.
+export class BiometricError extends Error {
+  constructor(label: string) {
+    super(`${label} verification failed. Try again.`);
+  }
+}
+
+// La réponse de /auth/login et /auth/register : pas encore de jeton, mais un code à six chiffres envoyé par email.
+export type Challenge = { verification_required: true; purpose: "verify" | "login"; email: string };
 
 // Un utilisateur tel que renvoyé par le backend (sans jamais le mot de passe).
 export type User = {

@@ -57,7 +57,6 @@ export default function AppHeader({ subtitle }: { subtitle?: string }) {
           Tasks
         </NavLink>
         <NavLink to="/notes">Notes</NavLink>
-        <NavLink to="/timers">Timers</NavLink>
         <NavLink to="/calendar">Calendar</NavLink>
         <NavLink to="/habits">Habits</NavLink>
         <NavLink to="/stats">Statistics</NavLink>

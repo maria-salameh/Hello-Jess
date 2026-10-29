@@ -5,6 +5,7 @@ import { CalendarModule } from './calendar/calendar.module';
 import { APP_CONFIG, loadConfig } from './config/configuration';
 import { HabitsModule } from './habits/habits.module';
 import { HealthController } from './health.controller';
+import { MailModule } from './mail/mail.module';
 import { NotesModule } from './notes/notes.module';
 import { RealtimeModule } from './realtime/realtime.module';
 import { StatsModule } from './stats/stats.module';
@@ -34,6 +35,7 @@ class ConfigModule {}
         synchronize: config.synchronize,
       }),
     }),
+    MailModule,
     UsersModule,
     WorkspacesModule,
     AuthModule,

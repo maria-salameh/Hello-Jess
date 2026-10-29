@@ -4,17 +4,26 @@ import { Platform, StyleSheet } from "react-native";
 
 // La palette de couleurs (thème sombre), définie une seule fois et réutilisée partout.
 const colors = {
-  bg: "#17161a",
-  card: "#211f26",
-  text: "#f2f0ef",
-  muted: "#a29e9b",
-  accent: "#6c5ce7",
-  border: "#33313a",
+  bg: "#12111a",
+  card: "#1c1a27",
+  text: "#f2f0ff",
+  muted: "#a09db8",
+  accent: "#7c6cf0",
+  border: "#2e2b3d",
   danger: "#e2574c",
   high: "#e2574c",
   medium: "#e2a33c",
   low: "#4caf82",
 };
+
+// Une ombre douce sous les cartes et les boutons (iOS dessine "shadow*", Android "elevation").
+const shadow = (opacity: number, radius: number, elevation: number) => ({
+  shadowColor: "#000",
+  shadowOpacity: opacity,
+  shadowRadius: radius,
+  shadowOffset: { width: 0, height: radius / 2 },
+  elevation,
+});
 
 export const styles = StyleSheet.create({
   // ----- Écrans de connexion et d'inscription -----
@@ -29,16 +38,49 @@ export const styles = StyleSheet.create({
   // La carte qui contient le formulaire.
   authCard: {
     backgroundColor: colors.card,
-    borderRadius: 16,
+    borderRadius: 22,
     padding: 24,
     gap: 10,
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadow(0.35, 24, 10),
+  },
+  // Phrase d'explication sous le titre d'une carte.
+  hint: {
+    color: colors.muted,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  // Le champ du code à six chiffres : gros chiffres espacés et centrés.
+  codeInput: {
+    fontSize: 28,
+    fontWeight: "700",
+    letterSpacing: 10,
+    textAlign: "center",
+    paddingVertical: 14,
+  },
+  // Les deux liens sous le bouton de l'étape du code ("Resend code" et "Back").
+  codeLinks: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  linkText: {
+    color: colors.accent,
+    fontSize: 14,
+  },
+  linkTextDisabled: {
+    color: colors.muted,
+  },
+  // Le bouton principal quand il ne peut pas encore être utilisé.
+  buttonDisabled: {
+    opacity: 0.45,
   },
   // Le titre "HelloJess" en couleur d'accent.
   title: {
-    fontSize: 26,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: "800",
+    letterSpacing: -0.5,
     color: colors.accent,
   },
   // Petite phrase grise sous le titre.
@@ -56,8 +98,8 @@ export const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 10,
-    padding: Platform.OS === "ios" ? 12 : 10,
+    borderRadius: 12,
+    padding: Platform.OS === "ios" ? 13 : 11,
     color: colors.text,
     backgroundColor: colors.bg,
     fontSize: 15,
@@ -65,10 +107,11 @@ export const styles = StyleSheet.create({
   // Le bouton principal (Log in / Sign up).
   button: {
     backgroundColor: colors.accent,
-    borderRadius: 10,
-    padding: 12,
+    borderRadius: 12,
+    padding: 14,
     alignItems: "center",
     marginTop: 8,
+    ...shadow(0.4, 12, 6),
   },
   // Le texte blanc des boutons.
   buttonText: {
@@ -176,10 +219,11 @@ export const styles = StyleSheet.create({
     alignItems: "flex-start",
     gap: 12,
     backgroundColor: colors.card,
-    borderRadius: 10,
+    borderRadius: 14,
     borderLeftWidth: 4,
     borderColor: colors.border,
     padding: 14,
+    ...shadow(0.2, 8, 3),
   },
   // Couleur de la bordure gauche selon la priorité : rouge, orange ou vert.
   priority_high: { borderLeftColor: colors.high },
@@ -355,20 +399,22 @@ export const styles = StyleSheet.create({
   // La rangée du menu sous l'en-tête.
   nav: {
     flexDirection: "row",
-    gap: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    gap: 4,
+    padding: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.card,
   },
   // Un onglet du menu, et son aspect quand c'est la page courante (souligné en couleur d'accent).
   navItem: {
-    paddingHorizontal: 12,
+    flex: 1,
+    alignItems: "center",
     paddingVertical: 8,
-    borderBottomWidth: 2,
-    borderBottomColor: "transparent",
-    marginBottom: -1,
+    borderRadius: 999,
   },
   navItemActive: {
-    borderBottomColor: colors.accent,
+    backgroundColor: colors.accent,
   },
   navText: {
     color: colors.muted,
@@ -376,7 +422,7 @@ export const styles = StyleSheet.create({
     fontSize: 14,
   },
   navTextActive: {
-    color: colors.accent,
+    color: "#fff",
   },
 
   // ----- Boutons-filtres ("chips") et formulaires -----
@@ -520,11 +566,19 @@ export const styles = StyleSheet.create({
   // Une carte de la page des statistiques (heatmap ou graphique).
   statsCard: {
     backgroundColor: colors.card,
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
     padding: 16,
     gap: 8,
+    ...shadow(0.2, 10, 3),
+  },
+  // La ligne de l'interrupteur Face ID du profil : texte à gauche, interrupteur à droite.
+  switchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
   },
   statsHeading: {
     color: colors.text,

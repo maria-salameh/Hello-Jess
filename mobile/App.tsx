@@ -2,9 +2,12 @@
 import { NavigationContainer, DarkTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import EggTimer from "./src/components/EggTimer";
 import { AuthProvider, useAuth } from "./src/context/AuthContext";
 import CalendarScreen from "./src/screens/CalendarScreen";
 import HabitsScreen from "./src/screens/HabitsScreen";
+import LockScreen from "./src/screens/LockScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
@@ -17,7 +20,7 @@ const Stack = createNativeStackNavigator();
 
 // Choisit les écrans disponibles selon que l'utilisateur est connecté ou non.
 function RootNavigator() {
-  const { user, loading } = useAuth();
+  const { user, loading, locked } = useAuth();
 
   // Pendant qu'on vérifie la session sauvegardée, on affiche un indicateur de chargement.
   if (loading) {
@@ -28,8 +31,13 @@ function RootNavigator() {
     );
   }
 
+  // Une session est sauvegardée mais Face ID n'a pas encore déverrouillé l'application.
+  if (locked) return <LockScreen />;
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <View style={{ flex: 1 }}>
+    {/* Les écrans glissent doucement depuis le bas. */}
+    <Stack.Navigator screenOptions={{ headerShown: false, animation: "fade_from_bottom" }}>
       {/* Connecté : la liste des tâches, le détail d'une tâche, le calendrier, les habitudes et les statistiques.
           Déconnecté : les écrans de connexion et d'inscription. */}
       {user ? (
@@ -48,6 +56,9 @@ function RootNavigator() {
         </>
       )}
     </Stack.Navigator>
+    {/* Le minuteur d'œuf flotte en bas à droite sur tous les écrans. */}
+    <EggTimer />
+    </View>
   );
 }
 
@@ -55,10 +66,12 @@ function RootNavigator() {
 // et le conteneur de navigation (en thème sombre) affiche les écrans.
 export default function App() {
   return (
-    <AuthProvider>
-      <NavigationContainer theme={DarkTheme}>
-        <RootNavigator />
-      </NavigationContainer>
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <NavigationContainer theme={DarkTheme}>
+          <RootNavigator />
+        </NavigationContainer>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

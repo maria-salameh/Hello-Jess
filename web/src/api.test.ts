@@ -1,6 +1,7 @@
 import { AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from "axios";
 import { beforeEach, describe, expect, it } from "vitest";
 import { WORKSPACE_KEY, api, errorMessages } from "./api";
+import { saveToken } from "./utils/session";
 
 const failure = (status: number | undefined, data?: unknown) =>
   new AxiosError("failed", "ERR", undefined, undefined, status ? ({ status, data } as never) : undefined);
@@ -45,7 +46,7 @@ describe("request interceptor", () => {
   });
 
   it("sends the token and the chosen workspace", () => {
-    localStorage.setItem("hellojess_token", "tok");
+    saveToken("tok", true);
     localStorage.setItem(WORKSPACE_KEY, "w9");
     const headers = headersFor();
     expect(headers.Authorization).toBe("Bearer tok");

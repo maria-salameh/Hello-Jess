@@ -1112,7 +1112,7 @@
   color: var(--muted);
 }
 
-/* ===== Workspaces, live indicator, notes and timers ===== */
+/* ===== Workspaces, live indicator and notes ===== */
 
 .workspace-select {
   padding: 8px 10px;
@@ -1137,8 +1137,7 @@
   box-shadow: 0 0 0 3px rgba(34, 160, 107, 0.2);
 }
 
-.workspace-item,
-.timer-item {
+.workspace-item {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1277,38 +1276,387 @@
   color: var(--muted);
 }
 
-.timer-item {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
+
+/* ===== Modern look: depth, rounded shapes and motion =====
+   Added on top of the page styles above. Entrance animations only set a "from" state, so each element
+   keeps its own final style (for example the faded look of a finished task). */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
 }
 
-.timer-item.running {
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+@keyframes grow-up {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes live-pulse {
+  70% {
+    box-shadow: 0 0 0 8px rgba(34, 160, 107, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 160, 107, 0);
+  }
+}
+
+/* Pages and cards slide in. */
+.tasks-page {
+  animation: fade-up 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.auth-card {
+  border-radius: 22px;
+  box-shadow: var(--shadow-lg);
+  animation: pop-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+/* Brand title with a gradient. */
+.tasks-header h1,
+.auth-card h1 {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+.tasks-header h1 {
+  font-size: 32px;
+}
+
+/* Cards: soft shadow and a small lift on hover. */
+.task-item,
+.habit-item,
+.detail-card,
+.stats-card,
+.workspace-item,
+.note-link {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.3s ease;
+}
+
+.task-item,
+.habit-item,
+.workspace-item,
+.note-link {
+  animation: fade-up 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.task-item:hover,
+.habit-item:hover,
+.workspace-item:hover,
+.note-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stats-card,
+.detail-card {
+  animation: fade-up 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+/* Lists appear one item after the other. */
+.task-list > :nth-child(2),
+.notes-list li:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.task-list > :nth-child(3),
+.notes-list li:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.task-list > :nth-child(4),
+.notes-list li:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.task-list > :nth-child(5),
+.notes-list li:nth-child(5) {
+  animation-delay: 0.16s;
+}
+.task-list > :nth-child(6),
+.notes-list li:nth-child(6) {
+  animation-delay: 0.2s;
+}
+.task-list > :nth-child(n + 7),
+.notes-list li:nth-child(n + 7) {
+  animation-delay: 0.24s;
+}
+
+/* Inputs: clear focus ring. */
+.auth-card input,
+.add-task-form input,
+.add-task-form select,
+.detail-card input,
+.detail-card select,
+.detail-card textarea,
+.profile-form input,
+.note-editor input,
+.note-editor textarea,
+.workspace-select,
+.filter-selects select {
+  border-radius: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+/* Primary buttons: gradient, lift on hover, press on click. */
+.auth-card button,
+.add-task-form button,
+.detail-card button:not(.danger-btn),
+.profile-form button[type="submit"],
+.primary-btn {
+  background: var(--grad);
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.32);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.auth-card button:hover,
+.add-task-form button:hover,
+.detail-card button:not(.danger-btn):hover,
+.profile-form button[type="submit"]:hover,
+.primary-btn:hover {
+  background: var(--grad);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(108, 92, 231, 0.4);
+}
+
+.auth-card button:active,
+.add-task-form button:active,
+.detail-card button:not(.danger-btn):active,
+.profile-form button[type="submit"]:active,
+.primary-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.logout-btn,
+.danger-outline-btn,
+.detail-card button.danger-btn {
+  border-radius: 12px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.logout-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.danger-outline-btn:hover,
+.detail-card button.danger-btn:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Navigation as pills. */
+.main-nav {
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.main-nav a {
+  margin: 0;
+  border: none;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.main-nav a:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.main-nav a.active {
+  background: var(--grad);
+  color: white;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.35);
+}
+
+/* Filter chips. */
+.chip {
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.chip.active {
+  background: var(--grad);
+  border-color: transparent;
+  color: white;
+}
+
+.chip.active:hover {
+  color: white;
+}
+
+/* User chip, avatars. */
+.user-chip {
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.user-avatar,
+.profile-avatar {
+  background: var(--grad);
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.35);
+}
+
+/* Live indicator pulses while connected. */
+.live-dot.on {
+  animation: live-pulse 2s ease-out infinite;
+}
+
+/* Habit days, calendar and charts. */
+.habit-day {
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.habit-day:hover {
+  transform: translateY(-2px);
   border-color: var(--accent);
 }
 
-.timer-clock {
-  font-size: 32px;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
+.habit-day.done {
+  background: var(--grad);
 }
 
-.timer-actions {
-  display: flex;
-  gap: 8px;
+.calendar-cell {
+  transition: background 0.2s ease;
+}
+
+.calendar-cell:hover {
+  background: var(--accent-soft);
+}
+
+.calendar-grid {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.calendar-event {
+  border-radius: 6px;
+}
+
+.completion-bar {
+  background: var(--grad);
+  border-radius: 6px 6px 0 0;
+  transform-origin: bottom;
+  animation: grow-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.completion-bar.empty {
+  background: var(--border);
+}
+
+.heatmap-cell {
+  border-radius: 3px;
+  animation: pop-in 0.4s ease backwards;
+  transition: transform 0.15s ease;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.5);
+}
+
+/* Messages. */
+.error,
+.success {
+  border-radius: 12px;
+  animation: fade-up 0.3s ease backwards;
+}
+
+.empty-state {
+  animation: fade-up 0.4s ease backwards;
+}
+
+/* ===== Two-step verification and "Stay logged in" ===== */
+
+.auth-card .stay-row {
+  flex-direction: row;
   align-items: center;
+  gap: 8px;
+  font-size: 13px;
 }
 
-.timer-actions button:not(.delete-btn) {
-  padding: 8px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+.code-hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.code-hint strong {
   color: var(--text);
-  cursor: pointer;
 }
 
-.minutes-input {
-  max-width: 90px;
+/* The six digits are spaced out so they are easy to read and compare with the email. */
+.auth-card input.code-input {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  text-align: center;
+  padding-left: calc(12px + 0.5em);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The small text buttons under the code form must not look like the main button. */
+.auth-card .switch {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.auth-card button.link-btn {
+  margin: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--accent);
+  font-weight: 500;
+  font-size: 14px;
+  filter: none;
+  transform: none;
+}
+
+.auth-card button.link-btn:hover:not(:disabled) {
+  background: none;
+  box-shadow: none;
+  text-decoration: underline;
+}
+
+.auth-card button.link-btn:disabled {
+  color: var(--muted);
+  cursor: default;
 }

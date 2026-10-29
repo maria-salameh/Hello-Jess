@@ -1,5 +1,6 @@
 // Comment l'application web parle au backend : un client HTTP partagé et la forme des données reçues.
 import axios from "axios";
+import { getToken } from "./utils/session";
 
 // Where the backend lives; empty means "same origin" (the web container proxies /api and /socket.io).
 export const API_URL: string = import.meta.env.VITE_API_URL ?? "";
@@ -13,10 +14,10 @@ export const api = axios.create({
   timeout: 10000,
 });
 
-// S'exécute avant chaque requête : si un jeton de connexion est sauvegardé dans le navigateur,
+// S'exécute avant chaque requête : si un jeton de connexion est sauvegardé dans le navigateur (voir utils/session.ts),
 // on l'ajoute pour que le backend sache qui fait la demande.
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("hellojess_token");
+  const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -41,6 +42,9 @@ export function errorMessages(err: unknown): string[] {
   }
   return ["Something went wrong. Please try again."];
 }
+
+// La réponse de /auth/login et /auth/register : pas encore de jeton, mais un code à six chiffres envoyé par email.
+export type Challenge = { verification_required: true; purpose: "verify" | "login"; email: string };
 
 // Un utilisateur tel que renvoyé par le backend (sans jamais le mot de passe).
 export type User = {
@@ -143,15 +147,3 @@ export type Note = {
   updatedAt: string;
 };
 
-// A shared countdown timer. A device computes the time left from "remainingMs" and "startedAt"
-// (see utils/timer.ts); "serverTime" lets it correct for a wrong local clock.
-export type SharedTimer = {
-  id: string;
-  workspaceId: string;
-  label: string;
-  durationMs: number;
-  remainingMs: number;
-  status: "idle" | "running" | "paused";
-  startedAt: string | null;
-  serverTime: string;
-};

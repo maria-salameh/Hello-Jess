@@ -2,7 +2,7 @@
 // On y arrive en touchant l'utilisateur affiché sous le titre.
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { api, errorMessages, type Habit, type TaskCount } from "../api";
 import ErrorList from "../components/ErrorList";
 import { useAuth } from "../context/AuthContext";
@@ -11,7 +11,7 @@ import { styles } from "./styles";
 
 export default function ProfileScreen() {
   const navigation = useNavigation<any>();
-  const { user, logout, updateProfile } = useAuth();
+  const { user, logout, updateProfile, faceId, setFaceIdEnabled } = useAuth();
   // Le résumé : nombre de tâches (par statut) et d'habitudes.
   const [counts, setCounts] = useState<TaskCount | null>(null);
   const [habitCount, setHabitCount] = useState<number | null>(null);
@@ -151,6 +151,21 @@ export default function ProfileScreen() {
           <Text style={styles.statsNote}>Loading...</Text>
         )}
       </View>
+
+      {/* Face ID : la troisième étape de la connexion, et le verrou de l'application. Seulement si le téléphone sait le faire. */}
+      {faceId.available && (
+        <View style={styles.statsCard}>
+          <View style={styles.switchRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.statsHeading}>{faceId.label}</Text>
+              <Text style={styles.statsNote}>
+                Confirm it is you with {faceId.label} after the email code, and whenever you reopen the app.
+              </Text>
+            </View>
+            <Switch value={faceId.enabled} onValueChange={(on) => void setFaceIdEnabled(on)} />
+          </View>
+        </View>
+      )}
 
       <TouchableOpacity style={styles.dangerButton} onPress={logout}>
         <Text style={styles.dangerText}>Log out</Text>
